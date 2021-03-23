@@ -1,2 +1,4 @@
 /logs_gpu/
 /model_gpu/
+
+*.jpg

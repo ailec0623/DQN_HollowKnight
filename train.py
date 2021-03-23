@@ -24,19 +24,23 @@ import tensorflow.compat.v1 as tf
 DQN_model_path = "model_gpu"
 DQN_log_path = "logs_gpu/"
 
+action_name = ["Nothing", "Move_Left", "Move_Right", "Attack_Left", "Attack_Right", "Attack_Up",
+           "Short_Jump", "Mid_Jump", "Long_Jump", "Skill_Down", "Skill_Left", 
+           "Skill_Right", "Skill_Up", "Rush_Left", "Rush_Right", "Cure"]
+
 HP_WIDTH = 768
 HP_HEIGHT = 407
 WIDTH = 152
 HEIGHT = 80
 
-window_size = (0,0,3840,2035)
+window_size = (0,0,1920,1017)
 
-action_size = 6
+action_size = 13
 # action[n_choose,j,k,m,r]
 # j-attack, k-jump, m-defense, r-dodge, n_choose-do nothing
 
 EPISODES = 3000
-big_BATCH_SIZE = 16
+big_BATCH_SIZE = 24
 UPDATE_STEP = 50
 # times that evaluate the network
 num_step = 0
@@ -62,19 +66,21 @@ if __name__ == '__main__':
         station = cv2.resize(screen_gray,(WIDTH,HEIGHT))
         hp_station = cv2.resize(screen_gray,(HP_WIDTH,HP_HEIGHT))
         # change graph to WIDTH * HEIGHT for station input
-        boss_blood = boss_hp(hp_station)
+        boss_blood = boss_hp(hp_station, 570)
+        last_hp = boss_blood
         self_blood = player_hp(hp_station)
         # count init blood
         target_step = 0
         # used to update target Q network
         done = 0
         total_reward = 0
+        min_hp = 9
 
         last_time = time.time()
         while True:
             station = np.array(station).reshape(-1,HEIGHT,WIDTH,1)[0]
             # reshape station for tf input placeholder
-            print('loop took {} seconds'.format(time.time()-last_time))
+            #print('loop took {} seconds'.format(time.time()-last_time))
             last_time = time.time()
             target_step += 1
             # get the action by state
@@ -87,13 +93,15 @@ if __name__ == '__main__':
             next_station = cv2.resize(screen_gray,(WIDTH,HEIGHT))
             next_hp_station = cv2.resize(screen_gray,(HP_WIDTH,HP_HEIGHT))
 
-            next_boss_blood = boss_hp(next_hp_station)
+            next_boss_blood = boss_hp(next_hp_station, last_hp)
+            last_hp = boss_blood
             next_self_blood = player_hp(next_hp_station)
 
             next_station = np.array(next_station).reshape(-1,HEIGHT,WIDTH,1)[0]
-            reward, done, emergence_break = Tool.Helper.action_judge(boss_blood, next_boss_blood,
-                                                               self_blood, next_self_blood
-                                                               , emergence_break)
+            reward, done, min_hp, emergence_break = Tool.Helper.action_judge(action, boss_blood, next_boss_blood,
+                                                               self_blood, next_self_blood, min_hp, emergence_break)
+            if reward != 0 and reward != -1 and reward != 1:
+                print(action_name[action], ": ", reward)
             # get action reward
             if emergence_break == 100:
                 # emergence break , save model and paused
