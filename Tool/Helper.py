@@ -22,15 +22,15 @@ def action_judge(action, boss_blood, next_boss_blood, self_blood, next_self_bloo
     
     elif next_boss_blood - boss_blood > 200:   #boss dead
         if emergence_break < 2:
-            reward = 0
-            done = 1
+            reward = 100
+            done = 2
             min_hp = 9
             emergence_break += 1
             print("Boss dead. Case 1", " ", next_boss_blood, " ", boss_blood)
             return reward, done, min_hp, emergence_break
         else:
-            reward = 0
-            done = 1
+            reward = 100
+            done = 2
             min_hp = 9
             emergence_break = 100
             print("Boss dead. Case 2")
@@ -60,7 +60,7 @@ def action_judge(action, boss_blood, next_boss_blood, self_blood, next_self_bloo
             # boss_blood_reward -= 1
 
         #Jump reward
-        elif(action > 6 and action < 9):
+        elif(action > 5 and action < 9):
               if next_self_blood - min_hp < 0 and next_self_blood != 0:
                 self_blood_reward = -45
                 min_hp = next_self_blood

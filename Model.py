@@ -219,6 +219,7 @@ class DQN():
         Q_value = self.Q_value.eval(feed_dict={
             self.state_input: [state]
         })[0]
+        # print(Q_value)
         # use epsilon greedy to get the action
         if random.random() <= self.epsilon:
             # if lower than epsilon, give a random value

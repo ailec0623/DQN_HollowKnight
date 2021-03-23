@@ -51,6 +51,7 @@ paused = True
 # used to stop training
 
 if __name__ == '__main__':
+    PASS_COUNT = 0
     agent = DQN(WIDTH, HEIGHT, action_size, DQN_model_path, DQN_log_path)
     print("Model init successfully")
     # DQN init
@@ -125,10 +126,14 @@ if __name__ == '__main__':
             paused = Tool.Helper.pause_game(paused)
             if done == 1:
                 break
+            elif done == 2:
+                PASS_COUNT += 1
+                time.sleep(6)
+                break
         if episode % 10 == 0:
             agent.save_model()
             # save model
-        print('episode: ', episode, 'Evaluation Average Reward:', total_reward/target_step)
+        print('episode: ', episode, '\nEvaluation Average Reward:', total_reward/target_step, "\nPass count: ", PASS_COUNT)
         
         
             

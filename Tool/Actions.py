@@ -150,9 +150,9 @@ def Look_up():
     ReleaseKey(UP_ARROW)
 
 def restart():
-    time.sleep(3)
+    time.sleep(5)
     Look_up()
-    time.sleep(2)
+    time.sleep(2.5)
     Look_up()
     time.sleep(1)
     Short_Jump()
