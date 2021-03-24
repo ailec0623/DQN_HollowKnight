@@ -1,147 +1,130 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 27 21:10:06 2021
+import numpy as np
+from tensorflow.keras.models import load_model
+import os
+import cv2
+import time
 
-@author: pang
-"""
+from Model import Model
+from DQN import DQN
+from Agent import Agent
+from ReplayMemory import ReplayMemory
+
 
 import Tool.Helper
 from Tool.Actions import take_action, restart
 from Tool.GrabScreen import grab_screen
 from Tool.GetHP import boss_hp, player_hp
-from Model import DQN
 
+window_size = (0,0,1920,1017)
+station_size = (230, 230, 1670, 930)
 
-import numpy as np
-import cv2
-import time
-import random
-import os
-import pandas as pd
-import random
-import tensorflow.compat.v1 as tf
+HP_WIDTH = 768
+HP_HEIGHT = 407
+WIDTH = 200
+HEIGHT = 100
+ACTION_DIM = 13
+INPUT_SHAPE = (HEIGHT, WIDTH, 3)
 
-DQN_model_path = "model_gpu"
-DQN_log_path = "logs_gpu/"
+LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
+MEMORY_SIZE = 1500  # replay memory的大小，越大越占用内存
+MEMORY_WARMUP_SIZE = 150  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+BATCH_SIZE = 16  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+LEARNING_RATE = 0.001  # 学习率
+GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
 action_name = ["Nothing", "Move_Left", "Move_Right", "Attack_Left", "Attack_Right", "Attack_Up",
            "Short_Jump", "Mid_Jump", "Long_Jump", "Skill_Down", "Skill_Left", 
            "Skill_Right", "Skill_Up", "Rush_Left", "Rush_Right", "Cure"]
 
-HP_WIDTH = 768
-HP_HEIGHT = 407
-WIDTH = 152
-HEIGHT = 80
 
-window_size = (0,0,1920,1017)
 
-action_size = 13
-# action[n_choose,j,k,m,r]
-# j-attack, k-jump, m-defense, r-dodge, n_choose-do nothing
+def run_episode(algorithm,agent,rpm,PASS_COUNT,paused):
+    restart()
+    
+    station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2BGR),(WIDTH,HEIGHT))
+    hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
-EPISODES = 3000
-big_BATCH_SIZE = 24
-UPDATE_STEP = 50
-# times that evaluate the network
-num_step = 0
-# used to save log graph
-target_step = 0
-# used to update target Q network
-paused = True
-# used to stop training
+    boss_blood = boss_hp(hp_station, 570)
+    last_hp = boss_blood
+    self_blood = player_hp(hp_station)
+    min_hp = 9
+
+    step = 0
+    done = 0
+    total_reward = 0
+
+    last_time = time.time()
+
+    while True:
+        last_time = time.time()
+        step += 1
+        action = agent.sample(station)
+
+        take_action(action)
+        
+        next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2BGR),(WIDTH,HEIGHT))
+        next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+
+        next_boss_blood = boss_hp(next_hp_station, last_hp)
+        last_hp = boss_blood
+        next_self_blood = player_hp(next_hp_station)
+
+        reward, done, min_hp = Tool.Helper.action_judge(action, boss_blood, next_boss_blood,
+                                                               self_blood, next_self_blood, min_hp)
+        print(action_name[action], ": ", reward)
+        rpm.append((station,action,reward,next_station,done))
+        if (len(rpm) > MEMORY_WARMUP_SIZE) and (step % LEARN_FREQ == 0):
+            batch_station,batch_action,batch_reward,batch_next_station,batch_done = rpm.sample(BATCH_SIZE)
+            algorithm.learn(batch_station,batch_action,batch_reward,batch_next_station,batch_done)
+            
+        station = next_station
+        self_blood = next_self_blood
+        boss_blood = next_boss_blood
+
+        total_reward += reward
+        paused = Tool.Helper.pause_game(paused)
+        if done == 1:
+            break
+        elif done == 2:
+            PASS_COUNT += 1
+            time.sleep(6)
+            break
+    return total_reward, step
+
 
 if __name__ == '__main__':
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = '/gpu:0'
     PASS_COUNT = 0
-    agent = DQN(WIDTH, HEIGHT, action_size, DQN_model_path, DQN_log_path)
-    print("Model init successfully")
-    # DQN init
+    rpm = ReplayMemory(MEMORY_SIZE)         # DQN的经验回放池
+
+
+    model = Model(INPUT_SHAPE, ACTION_DIM)
+    if os.path.exists('dqn_model.h5'):
+        print("model exists , load model\n")
+        model.model = load_model('dqn_model.h5')
+    algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.5,e_greed_decrement=1e-5)
+    
+    paused = True
     paused = Tool.Helper.pause_game(paused)
-    # paused at the begin
-    emergence_break = 0     
-    # emergence_break is used to break down training
-    # 用于防止出现意外紧急停止训练防止错误训练数据扰乱神经网络
-    for episode in range(EPISODES):
-        restart()
-        screen_gray = cv2.cvtColor(grab_screen(window_size),cv2.COLOR_BGR2GRAY)
-        # collect station gray graph
-        station = cv2.resize(screen_gray,(WIDTH,HEIGHT))
-        hp_station = cv2.resize(screen_gray,(HP_WIDTH,HP_HEIGHT))
-        # change graph to WIDTH * HEIGHT for station input
-        boss_blood = boss_hp(hp_station, 570)
-        last_hp = boss_blood
-        self_blood = player_hp(hp_station)
-        # count init blood
-        target_step = 0
-        # used to update target Q network
-        done = 0
-        total_reward = 0
-        min_hp = 9
 
-        last_time = time.time()
-        while True:
-            station = np.array(station).reshape(-1,HEIGHT,WIDTH,1)[0]
-            # reshape station for tf input placeholder
-            #print('loop took {} seconds'.format(time.time()-last_time))
-            last_time = time.time()
-            target_step += 1
-            # get the action by state
-            action = agent.Choose_Action(station)
-            take_action(action)
-            # take station then the station change
-            screen_gray = cv2.cvtColor(grab_screen(window_size),cv2.COLOR_BGR2GRAY)
-            # collect blood gray graph for count self and boss blood
+    # 先往经验池里存一些数据，避免最开始训练的时候样本丰富度不够
+    while len(rpm) < MEMORY_WARMUP_SIZE:
+        print("WARM UP:", len(rpm))
+        run_episode(algorithm, agent, rpm, PASS_COUNT, paused)
 
-            next_station = cv2.resize(screen_gray,(WIDTH,HEIGHT))
-            next_hp_station = cv2.resize(screen_gray,(HP_WIDTH,HP_HEIGHT))
+    max_episode = 3000
 
-            next_boss_blood = boss_hp(next_hp_station, last_hp)
-            last_hp = boss_blood
-            next_self_blood = player_hp(next_hp_station)
-
-            next_station = np.array(next_station).reshape(-1,HEIGHT,WIDTH,1)[0]
-            reward, done, min_hp, emergence_break = Tool.Helper.action_judge(action, boss_blood, next_boss_blood,
-                                                               self_blood, next_self_blood, min_hp, emergence_break)
-            if reward != 0 and reward != -1 and reward != 1:
-                print(action_name[action], ": ", reward)
-            # get action reward
-            if emergence_break == 100:
-                # emergence break , save model and paused
-                # 遇到紧急情况，保存数据，并且暂停
-                print("emergence_break")
-                agent.save_model()
-                paused = True
-            agent.Store_Data(station, action, reward, next_station, done)
-            if len(agent.replay_buffer) > big_BATCH_SIZE:
-                num_step += 1
-                # save loss graph
-                # print('train')
-                agent.Train_Network(big_BATCH_SIZE, num_step)
-            if target_step % UPDATE_STEP == 0:
-                agent.Update_Target_Network()
-                # update target Q network
-            station = next_station
-            self_blood = next_self_blood
-            boss_blood = next_boss_blood
-            total_reward += reward
-            paused = Tool.Helper.pause_game(paused)
-            if done == 1:
-                break
-            elif done == 2:
-                PASS_COUNT += 1
-                time.sleep(6)
-                break
-        if episode % 10 == 0:
-            agent.save_model()
-            # save model
-        print('episode: ', episode, '\nEvaluation Average Reward:', total_reward/target_step, "\nPass count: ", PASS_COUNT)
-        
-        
-            
-            
-            
-            
-            
-        
-        
-    
-    
+    # 开始训练
+    episode = 0
+    while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
+        # 训练
+        total_reward, total_step = run_episode(algorithm,agent,rpm, PASS_COUNT, paused)
+        episode += 1
+        print("Episode: ", episode, ", mean(reward):", total_reward/total_step)
+        # 保存模型
+        if episode % 10 == 9:
+            save_path = './dqn_model.h5'
+            model.model.save(save_path)

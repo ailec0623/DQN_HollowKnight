@@ -26,13 +26,13 @@ def Nothing():
 def Move_Left():
     # print("Move left--->")
     PressKey(LEFT_ARROW)
-    time.sleep(0.1)
+    time.sleep(0.2)
     ReleaseKey(LEFT_ARROW)
 # 2
 def Move_Right():
     # print("Move right--->")
     PressKey(RIGHT_ARROW)
-    time.sleep(0.1)
+    time.sleep(0.2)
     ReleaseKey(RIGHT_ARROW)
 
 # Attack
@@ -87,28 +87,28 @@ def Long_Jump():
 def Skill_Left():
     PressKey(LEFT_ARROW)
     PressKey(Z)
-    time.sleep(0.05)
+    time.sleep(0.2)
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(Z)
 # 10
 def Skill_Right():
     PressKey(RIGHT_ARROW)
     PressKey(Z)
-    time.sleep(0.05)
+    time.sleep(0.2)
     ReleaseKey(RIGHT_ARROW)
     ReleaseKey(Z)
 # 11
 def Skill_Up():
     PressKey(UP_ARROW)
     PressKey(Z)
-    time.sleep(0.05)
+    time.sleep(0.2)
     ReleaseKey(UP_ARROW)
     ReleaseKey(Z)
 # 12
 def Skill_Down():
     PressKey(DOWN_ARROW)
     PressKey(Z)
-    time.sleep(0.05)
+    time.sleep(0.2)
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(Z)
 
