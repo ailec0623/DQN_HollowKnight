@@ -4,13 +4,12 @@ import win32gui, win32ui, win32con, win32api
 
 
 
-class Contraler:
-  def __init__(self):
-    self.hwnd = win32gui.FindWindow(None,'Hollow Knight')
 
-  def grab_screen(self, region=None):
+hwnd = win32gui.FindWindow(None,'Hollow Knight')
+
+def grab_screen(region=None):
   
-    # print(hwin)
+
     if region:
             left,top,x2,y2 = region
             width = x2 - left + 1
@@ -21,7 +20,7 @@ class Contraler:
         left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
         top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
 
-    hwindc = win32gui.GetWindowDC(self.hwnd)
+    hwindc = win32gui.GetWindowDC(hwnd)
     srcdc = win32ui.CreateDCFromHandle(hwindc)
     memdc = srcdc.CreateCompatibleDC()
     bmp = win32ui.CreateBitmap()
@@ -35,15 +34,41 @@ class Contraler:
 
     srcdc.DeleteDC()
     memdc.DeleteDC()
-    win32gui.ReleaseDC(hwin, hwindc)
+    win32gui.ReleaseDC(hwnd, hwindc)
     win32gui.DeleteObject(bmp.GetHandle())
 
     return img
   
 
-  def PressKey(self, hexKeyCode):
-    win32gui.PostMessage(self.hwnd, win32con.WM_KEYDOWN, hexKeyCode, 0)
+def PressKey( hexKeyCode):
+    win32api.keybd_event(hexKeyCode, 0, win32con.KEYEVENTF_EXTENDEDKEY, 0)
 
 
-  def ReleaseKey(self, hexKeyCode):
-    win32gui.PostMessage(self.hwnd, win32con.WM_KEYUP, hexKeyCode, 0)
+def ReleaseKey( hexKeyCode):
+    win32api.keybd_event(hexKeyCode, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+
+def key_check():
+    operations = []
+    if win32api.GetAsyncKeyState(0x41):
+        operations.append("A")
+    if win32api.GetAsyncKeyState(0x43):
+        operations.append("C")
+    if win32api.GetAsyncKeyState(0x58):
+        operations.append("X")
+    if win32api.GetAsyncKeyState(0x5A):
+        operations.append("Z")
+    if win32api.GetAsyncKeyState(0x70):
+        operations.append("T")
+
+    direction = []
+    if win32api.GetAsyncKeyState(0x25):
+        direction.append("Left")
+    if win32api.GetAsyncKeyState(0x26):
+        direction.append("Up")
+    if win32api.GetAsyncKeyState(0x27):
+        direction.append("Right")
+    if win32api.GetAsyncKeyState(0x28):
+        direction.append("Down")
+
+    return operations, direction

@@ -12,7 +12,6 @@ from PIL import ImageGrab
 import cv2
 import time
 from Tool.GrabScreen import grab_screen
-# from GrabScreen import grab_screen
 import os
 
 x = 129
@@ -60,46 +59,6 @@ def boss_hp(gray, last_hp):
         #print(boss_blood, "  ", last_hp)
         return last_hp
     return boss_blood
-
-
-
-# window_size = (0,0,1920,1017)
-# last_time = time.time()
-
-# # screen_gray = cv2.cvtColor(grab_screen(window_size),cv2.COLOR_BGR2GRAY)#灰度图像收集
-# # screen_gray = cv2.resize(screen_gray,(768,407))
-# # cv2.line(screen_gray, (97, 405), (671, 405), (255, 0, 0), 1, 4)
-
-# # #self_blood = player_hp(screen_gray)
-# # #boss_blood = boss_hp(screen_gray)
-# # #print(self_blood)
-# # # for point in points:
-# # #     cv2.circle(screen_gray, point, 1, (255, 0, 0), 1)
-
-# # cv2.imshow('test.jpg', screen_gray)
-# hp = 355
-# while(True):
-#     screen_gray = cv2.cvtColor(grab_screen(window_size),cv2.COLOR_BGR2GRAY)#灰度图像收集
-#     screen_gray = cv2.resize(screen_gray,(768,407))
-
-#     #hp = player_hp(screen_gray)
-#     hp = boss_hp(screen_gray, hp)
-#     print(hp)
-#     # for point in points:
-#     #     cv2.circle(screen_gray, point, 1, (255, 0, 0), 1)
-#     cv2.line(screen_gray, (97, hp_y), (671, hp_y), (255, 0, 0), 1, 4)
-
-#     cv2.imshow('window1',screen_gray)
-
-#     #测试时间用
-#     #print('loop took {} seconds'.format(time.time()-last_time))
-#     last_time = time.time()
-    
-    
-#     if cv2.waitKey(5) & 0xFF == ord('q'):
-#         break
-# cv2.waitKey()# 视频结束后，按任意键退出
-# cv2.destroyAllWindows()
 
 
 

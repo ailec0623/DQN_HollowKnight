@@ -1,7 +1,7 @@
 # Define the actions we may need during training
 # You can define your actions here
 
-from Tool.SendKey import PressKey, ReleaseKey
+from Tool.WindowsAPI import PressKey, ReleaseKey
 import time
 
 # Hash code for key we may use: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN

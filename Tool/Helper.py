@@ -1,4 +1,4 @@
-from Tool.GetKeys import key_check
+from Tool.WindowsAPI import key_check
 import time
 
 def mean(d):

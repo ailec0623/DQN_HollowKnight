@@ -15,7 +15,7 @@ from ReplayMemory import ReplayMemory
 import Tool.Helper
 from Tool.Helper import mean
 from Tool.Actions import take_action, restart
-from Tool.GrabScreen import grab_screen
+from Tool.WindowsAPI import grab_screen
 from Tool.GetHP import boss_hp, player_hp
 from Tool.UserInput import User
 
