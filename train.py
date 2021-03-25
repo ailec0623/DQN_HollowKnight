@@ -29,7 +29,7 @@ HEIGHT = 500
 ACTION_DIM = 15
 INPUT_SHAPE = (HEIGHT, WIDTH, 3)
 
-DELEY_REWARD = 16
+DELEY_REWARD = 8
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 1000  # replay memory的大小，越大越占用内存
@@ -182,7 +182,7 @@ if __name__ == '__main__':
         model.model = load_model('dqn_model.h5')
 
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.5,e_greed_decrement=1e-5)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.1,e_greed_decrement=1e-5)
     user = User()
 
 

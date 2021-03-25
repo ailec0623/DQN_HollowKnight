@@ -67,7 +67,7 @@ def action_judge(action, boss_blood, next_boss_blood, self_blood, next_self_bloo
 
         elif(action == 5):
             # It is good for model to try more movement
-            boss_blood_reward -= 0
+            boss_blood_reward -= 2
 
         #Jump reward
         elif(action == 6):
@@ -95,8 +95,8 @@ def action_judge(action, boss_blood, next_boss_blood, self_blood, next_self_bloo
             #     boss_blood_reward -= 10
 
         elif(action == 11):
-            if boss_blood_reward == 0:
-                boss_blood_reward -= 20
+            if boss_blood_reward != 0:
+                boss_blood_reward += 20
 
         elif(action == 12):
             if boss_blood_reward != 0:
