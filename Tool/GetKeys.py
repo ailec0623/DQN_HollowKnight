@@ -8,13 +8,29 @@ Created on Wed Apr  8 12:03:44 2020
 import win32api as wapi
 import time
 
-keyList = ["\b"]
-for char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ 123456789,.'£$/\\":
-    keyList.append(char)
+
 
 def key_check():
-    keys = []
-    for key in keyList:
-        if wapi.GetAsyncKeyState(ord(key)):
-            keys.append(key)
-    return keys
+    operations = []
+    if wapi.GetAsyncKeyState(0x41):
+        operations.append("A")
+    if wapi.GetAsyncKeyState(0x43):
+        operations.append("C")
+    if wapi.GetAsyncKeyState(0x58):
+        operations.append("X")
+    if wapi.GetAsyncKeyState(0x5A):
+        operations.append("Z")
+    if wapi.GetAsyncKeyState(0x54):
+        operations.append("T")
+
+    direction = []
+    if wapi.GetAsyncKeyState(0x25):
+        direction.append("Left")
+    if wapi.GetAsyncKeyState(0x26):
+        direction.append("Up")
+    if wapi.GetAsyncKeyState(0x27):
+        direction.append("Right")
+    if wapi.GetAsyncKeyState(0x28):
+        direction.append("Down")
+
+    return operations, direction

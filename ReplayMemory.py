@@ -1,13 +1,26 @@
 import random
 import collections
 import numpy as np
+import pickle
+import os
 
 class ReplayMemory:
-    def __init__(self,max_size):
-        self.buffer = collections.deque(maxlen=max_size)
+    def __init__(self,max_size,file_name=None,user=False):
+        self.user = user
+        self.size = max_size
+        if file_name:
+            self.buffer = load(file_name)
+        else:
+            self.buffer = collections.deque(maxlen=max_size)
 
     def append(self,exp):
         self.buffer.append(exp)
+        if self.user:
+            if len(self.buffer) >= self.size:
+                self.save()
+                self.buffer = collections.deque(maxlen=self.size)
+
+
 
     def sample(self,batch_size):
         mini_batch = random.sample(self.buffer, batch_size)
@@ -24,6 +37,17 @@ class ReplayMemory:
         return np.array(obs_batch).astype('float32'), \
             np.array(action_batch).astype('int32'), np.array(reward_batch).astype('float32'),\
             np.array(next_obs_batch).astype('float32'), np.array(done_batch).astype('float32')
+
+    def save(self):
+        count = 0
+        for x in os.listdir('./user_data/'):
+            count += 1
+        file_name = "./user_data/user_data_" + str(count) +".txt"
+        pickle.dump(self.buffer, open(file_name, 'wb'))
+        print("Save user data:", file_name)
+
+    def load(file_name):
+        return pickle.load(open(file_name, 'rb'))
 
     def __len__(self):
         return len(self.buffer)

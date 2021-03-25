@@ -17,6 +17,7 @@ class Agent:
             act = np.random.randint(self.act_dim)  # 探索：每个动作都有概率被选择
         else:
             act = self.predict(station)  # 选择最优动作
+            # print(act)
         self.e_greed = max(
             0.01, self.e_greed - self.e_greed_decrement)  # 随着训练逐步收敛，探索的程度慢慢降低
         return act
@@ -24,4 +25,5 @@ class Agent:
     def predict(self,station):
         station = tf.expand_dims(station,axis=0)
         action = self.algorithm.model.predict(station)
+        # print(action)
         return np.argmax(action)

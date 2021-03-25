@@ -41,16 +41,20 @@ def boss_hp(gray, last_hp):
     boss_blood = 0
 
     #print(gray[hp_y][97],gray[hp_y][200],gray[hp_y][400])
-    #print(gray[hp_y][600],gray[hp_y][668],gray[hp_y][671])
+    # print(gray[hp_y][100],gray[hp_y][200],gray[hp_y][300])
     if(gray[hp_y][96] < 44 or gray[hp_y][96] > 46):
+        # print("case 1")
         return MAX_BOSS_HP
-    for boss_bd_num in gray[hp_y]:
-        if boss_bd_num > 25 and boss_bd_num < 31:
+    for i in range(97, 666):
+        if gray[hp_y][i] > 25 and gray[hp_y][i] < 31:
             boss_blood += 1
+        else:
+            break
         #print("Count hp: ", boss_blood)
 
     if boss_blood - last_hp < -300:
-        return MAX_BOSS_HP
+        # print("case 2")
+        return last_hp
 
     elif abs(boss_blood - last_hp) < 3:
         #print(boss_blood, "  ", last_hp)

@@ -1,4 +1,6 @@
 /logs_gpu/
 /model_gpu/
 /back_up/
+/user_data/
 *.jpg
+*.h5

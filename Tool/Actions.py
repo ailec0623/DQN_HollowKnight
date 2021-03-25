@@ -156,11 +156,12 @@ def restart():
     Look_up()
     time.sleep(1)
     Short_Jump()
+    time.sleep(3)
 
 
 # List for action functions
 Actions = [Nothing, Move_Left, Move_Right, Attack_Left, Attack_Right, Attack_Up,
-           Short_Jump, Mid_Jump, Long_Jump, Skill_Down, Skill_Left, Skill_Right, 
+           Short_Jump, Mid_Jump, Long_Jump, Skill_Left, Skill_Right, Skill_Down, 
            Skill_Up, Rush_Left, Rush_Right, Cure]
 
 # Run the action
