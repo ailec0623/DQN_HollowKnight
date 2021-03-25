@@ -2,6 +2,8 @@ import tensorflow as tf
 
 class DQN:
     def __init__(self,model,gamma=0.9,learnging_rate=0.01):
+        self.act_dim = model.act_dim
+        self.act_seq = model.act_seq
         self.model = model.model
         self.target_model = model.target_model
         self.gamma = gamma
@@ -12,7 +14,7 @@ class DQN:
         # self.model.train_loss = tf.metrics.Mean(name="train_loss")
         # ------------------------------------------------------------ #
         self.global_step = 0
-        self.update_target_steps = 200  # 每隔200个training steps再把model的参数复制到target_model中
+        self.update_target_steps = 100  # 每隔200个training steps再把model的参数复制到target_model中
 
 
     def predict(self, obs):
@@ -38,7 +40,7 @@ class DQN:
         for epoch in tf.range(1,epochs+1):
             self._train_step(action,features,labels)
 
-    def learn(self,obs,action,reward,next_obs,terminal):
+    def learn(self,obs,actions,reward,next_obs,terminal):
         """ 使用DQN算法更新self.model的value网络
         """
         # print('learning')
@@ -49,12 +51,20 @@ class DQN:
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
         next_pred_value = self.target_model.predict(next_obs)
-        best_v = tf.reduce_max(next_pred_value,axis=1)
-        terminal = tf.cast(terminal,dtype=tf.float32)
-        target = reward + self.gamma * (1.0 - terminal) * best_v
-        # print('get q')
-        # 训练模型
-        self._train_model(action,obs,target,epochs=1)
+        print(next_pred_value.shape)
+        next_pred_value = next_pred_value.reshape((len(reward), self.act_seq, self.act_dim))
+        
+        best_v = tf.transpose(tf.reduce_max(next_pred_value,axis=2))
+        actions = [[row[i] for row in actions] for i in range(len(actions[0]))]
+        for i, acts in enumerate(actions):
+            for a in acts:
+                a += i * self.act_dim
+        for i in range(self.act_seq):
+            terminal = tf.cast(terminal,dtype=tf.float32)
+            target = reward + self.gamma * (1.0 - terminal) * best_v[i]
+            # print('get q')
+            # 训练模型
+            self._train_model(actions[i],obs,target,epochs=1)
         self.global_step += 1
         # print('finish')
     def replace_target(self):

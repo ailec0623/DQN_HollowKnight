@@ -1,20 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Apr  8 12:14:29 2020
-
-@author: pang
-API for get screen image, no need to change
-Usage: grab_screen(left, top, right, bottom)
-"""
-
 import cv2
 import numpy as np
 import win32gui, win32ui, win32con, win32api
 
-def grab_screen(region=None):
 
-    hwin = win32gui.FindWindow(None,'Hollow Knight')
 
+class Contraler:
+  def __init__(self):
+    self.hwnd = win32gui.FindWindow(None,'Hollow Knight')
+
+  def grab_screen(self, region=None):
+  
     # print(hwin)
     if region:
             left,top,x2,y2 = region
@@ -26,7 +21,7 @@ def grab_screen(region=None):
         left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
         top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
 
-    hwindc = win32gui.GetWindowDC(hwin)
+    hwindc = win32gui.GetWindowDC(self.hwnd)
     srcdc = win32ui.CreateDCFromHandle(hwindc)
     memdc = srcdc.CreateCompatibleDC()
     bmp = win32ui.CreateBitmap()
@@ -44,3 +39,11 @@ def grab_screen(region=None):
     win32gui.DeleteObject(bmp.GetHandle())
 
     return img
+  
+
+  def PressKey(self, hexKeyCode):
+    win32gui.PostMessage(self.hwnd, win32con.WM_KEYDOWN, hexKeyCode, 0)
+
+
+  def ReleaseKey(self, hexKeyCode):
+    win32gui.PostMessage(self.hwnd, win32con.WM_KEYUP, hexKeyCode, 0)

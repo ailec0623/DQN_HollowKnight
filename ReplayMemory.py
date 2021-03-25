@@ -8,17 +8,18 @@ class ReplayMemory:
     def __init__(self,max_size,file_name=None,user=False):
         self.user = user
         self.size = max_size
+        self.count = 0
         if file_name:
             self.buffer = load(file_name)
         else:
             self.buffer = collections.deque(maxlen=max_size)
 
     def append(self,exp):
+        count += 1
         self.buffer.append(exp)
-        if self.user:
-            if len(self.buffer) >= self.size:
-                self.save()
-                self.buffer = collections.deque(maxlen=self.size)
+        if count % self.size == 0:
+            self.save()
+            self.buffer = collections.deque(maxlen=self.size)
 
 
 
@@ -40,11 +41,11 @@ class ReplayMemory:
 
     def save(self):
         count = 0
-        for x in os.listdir('./user_data/'):
+        for x in os.listdir('./memory/'):
             count += 1
-        file_name = "./user_data/user_data_" + str(count) +".txt"
+        file_name = "./memory/memory_" + str(count) +".txt"
         pickle.dump(self.buffer, open(file_name, 'wb'))
-        print("Save user data:", file_name)
+        print("Save memory:", file_name)
 
     def load(file_name):
         return pickle.load(open(file_name, 'rb'))

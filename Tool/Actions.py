@@ -41,7 +41,7 @@ def Attack_Left():
     # print("Attack left--->")
     PressKey(LEFT_ARROW)
     PressKey(X)
-    time.sleep(0.05)
+    time.sleep(0.25)
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(X)
 # 4
@@ -49,7 +49,7 @@ def Attack_Right():
     # print("Attack right--->")
     PressKey(RIGHT_ARROW)
     PressKey(X)
-    time.sleep(0.05)
+    time.sleep(0.25)
     ReleaseKey(RIGHT_ARROW)
     ReleaseKey(X)
 # 5
@@ -57,7 +57,7 @@ def Attack_Up():
     # print("Attack up--->")
     PressKey(UP_ARROW)
     PressKey(X)
-    time.sleep(0.05)
+    time.sleep(0.25)
     ReleaseKey(UP_ARROW)
     ReleaseKey(X)
 
@@ -72,39 +72,30 @@ def Mid_Jump():
     PressKey(C)
     time.sleep(0.5)
     ReleaseKey(C)
-# 8
-def Long_Jump():
-    PressKey(C)
-    time.sleep(0.5)
-    ReleaseKey(C)
-    PressKey(C)
-    time.sleep(0.5)
-    ReleaseKey(C)
-
 
 # Skill
-# 9
+# 8
 def Skill_Left():
     PressKey(LEFT_ARROW)
     PressKey(Z)
     time.sleep(0.2)
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(Z)
-# 10
+# 9
 def Skill_Right():
     PressKey(RIGHT_ARROW)
     PressKey(Z)
     time.sleep(0.2)
     ReleaseKey(RIGHT_ARROW)
     ReleaseKey(Z)
-# 11
+# 10
 def Skill_Up():
     PressKey(UP_ARROW)
     PressKey(Z)
     time.sleep(0.2)
     ReleaseKey(UP_ARROW)
     ReleaseKey(Z)
-# 12
+# 11
 def Skill_Down():
     PressKey(DOWN_ARROW)
     PressKey(Z)
@@ -113,25 +104,25 @@ def Skill_Down():
     ReleaseKey(Z)
 
 # Rush
-# 13
+# 12
 def Rush_Left():
     PressKey(LEFT_ARROW)
     PressKey(L_SHIFT)
-    time.sleep(0.05)
+    time.sleep(0.2)
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(L_SHIFT)
-# 14
+# 13
 def Rush_Right():
     PressKey(RIGHT_ARROW)
     PressKey(L_SHIFT)
-    time.sleep(0.05)
+    time.sleep(0.2)
     ReleaseKey(RIGHT_ARROW)
     ReleaseKey(L_SHIFT)
 
 
 
 # Cure
-#15
+#14
 def Cure():
     PressKey(A)
     time.sleep(1)
@@ -161,7 +152,7 @@ def restart():
 
 # List for action functions
 Actions = [Nothing, Move_Left, Move_Right, Attack_Left, Attack_Right, Attack_Up,
-           Short_Jump, Mid_Jump, Long_Jump, Skill_Left, Skill_Right, Skill_Down, 
+           Short_Jump, Mid_Jump, Skill_Left, Skill_Right, Skill_Down, 
            Skill_Up, Rush_Left, Rush_Right, Cure]
 
 # Run the action
