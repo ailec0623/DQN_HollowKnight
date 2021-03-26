@@ -90,35 +90,55 @@ def Skill_Left():
     PressKey(LEFT_ARROW)
     time.sleep(0.08)
     PressKey(Z)
+    PressKey(X)
     time.sleep(0.2)
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(Z)
+    ReleaseKey(X)
     time.sleep(0.1)
 # 9
 def Skill_Right():
     PressKey(RIGHT_ARROW)
     time.sleep(0.08)
     PressKey(Z)
+    PressKey(X)
     time.sleep(0.2)
     ReleaseKey(RIGHT_ARROW)
     ReleaseKey(Z)
+    ReleaseKey(X)
     time.sleep(0.1)
 # 10
 def Skill_Up():
     PressKey(UP_ARROW)
     PressKey(Z)
-    time.sleep(0.2)
+    PressKey(X)
+    time.sleep(0.3)
     ReleaseKey(UP_ARROW)
     ReleaseKey(Z)
-    time.sleep(0.4)
+    ReleaseKey(X)
+
+    time.sleep(0.1)
+    PressKey(X)
+    time.sleep(0.1)
+    ReleaseKey(X)
+    time.sleep(0.1)
 # 11
 def Skill_Down():
     PressKey(DOWN_ARROW)
     PressKey(Z)
+    PressKey(X)
     time.sleep(0.2)
+    ReleaseKey(X)
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(Z)
-    time.sleep(0.8)
+    
+    for i in range(3):
+        time.sleep(0.1)
+        PressKey(X)
+        time.sleep(0.15)
+        ReleaseKey(X)
+    time.sleep(0.1)
+
 
 # Rush
 # 12
@@ -168,7 +188,6 @@ def restart():
         station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
         if station[187][612][0] > 200: 
             Short_Jump()
-            time.sleep(3)
             break
         else:
             Look_up()

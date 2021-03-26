@@ -22,16 +22,17 @@ for i in range(9):
     points.append((x + i * step, y))
 
 MAX_BOSS_HP = 570
-hp_y = 400
+hp_y = 401
 
 
 
 def player_hp(gray):
     hp = 0
-    # print("---------------------------")
+    case = 0
     
     if(gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20):
         # print(gray[40][95], ", ", gray[300][30], ", ", gray[200][30])
+        case = 0
         return 9
     for idx, point in enumerate(points):
         x_, y_ = point[0], point[1]
@@ -40,9 +41,10 @@ def player_hp(gray):
         if idx == 0:
             if pixel == 150:
                 # print(idx, "case 1", pixel)
-                pass
+                break
             elif((pixel > 58 and pixel < 100 )  or (pixel >= 196 and pixel <= 241) or (pixel >= 145 and pixel <= 180)):
                 # print(idx, "case 2", pixel)
+                case = 2
                 hp = idx + 1
             else: 
                 pass
@@ -54,6 +56,7 @@ def player_hp(gray):
                 pass
             elif((pixel > 60 and pixel < 100 ) or (pixel >= 196 and pixel <= 241) or (pixel >= 144 and pixel <= 180)):
                 # print(idx, "case 2", pixel)
+                case = 3
                 hp = idx + 1
             else: 
                 # print(idx, "case 3", pixel)
@@ -62,7 +65,9 @@ def player_hp(gray):
 
     # print(hp)
     if hp == 0:
+        case = 4
         return 1
+    # print(case)
     return hp
 
 def boss_hp(gray, last_hp):
@@ -70,22 +75,24 @@ def boss_hp(gray, last_hp):
 
     #print(gray[hp_y][97],gray[hp_y][200],gray[hp_y][400])
     # print(gray[hp_y][100],gray[hp_y][200],gray[hp_y][300])
-    if(gray[hp_y][96] < 44 or gray[hp_y][96] > 46):
+    if(gray[hp_y][98] != 0 or gray[hp_y][200] == 0):
         # print("case 1")
         return MAX_BOSS_HP
-    for i in range(97, 666):
-        if gray[hp_y][i] > 25 and gray[hp_y][i] < 31:
+
+    for i in range(100, 666):
+        if (gray[hp_y][i] > 25 and gray[hp_y][i] < 31) or (gray[hp_y][i] > 44 and gray[hp_y][i] < 50):
             boss_blood += 1
         else:
             break
-        #print("Count hp: ", boss_blood)
+        # print("Count hp: ", boss_blood)
 
     if boss_blood - last_hp < -300:
+        # print("shoudl be ", boss_blood)
         # print("case 2")
         return last_hp
 
     elif abs(boss_blood - last_hp) < 3:
-        #print(boss_blood, "  ", last_hp)
+        # print("case 3")
         return last_hp
     return boss_blood
 

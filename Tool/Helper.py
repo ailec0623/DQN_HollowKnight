@@ -1,6 +1,15 @@
 from Tool.WindowsAPI import key_check
 import time
 
+
+def is_end(next_self_blood, min_hp, next_boss_blood, boss_blood):
+    if next_self_blood ==9 and min_hp <= 1:    
+        return True
+    elif next_boss_blood - boss_blood > 200:   
+        return True
+    return False
+
+
 def mean(d):
     t = 0
     for i in d:
@@ -23,7 +32,7 @@ def count_boss_reward(next_boss_blood, boss_blood):
 def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_hp):
     # get action reward
     # Player dead
-    if next_self_blood - self_blood > 5:     
+    if next_self_blood ==9 and min_hp <= 1:    
         
         reward = -35
         done = 1
@@ -36,7 +45,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
         reward = 30
         done = 2
         min_hp = 9
-        print("Boss dead. Case 1", " ", next_boss_blood, " ", boss_blood)
+        print("Boss dead.")
         return reward, done, min_hp
 
     # playing

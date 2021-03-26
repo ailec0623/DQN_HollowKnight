@@ -11,56 +11,58 @@ import os
 
 
 
-# action = 14
+action = 11
 # actions = [13,13, 3,3, 7,6, 12,6, 10, 4,4]
-# # actions = [action, action, action, action, action]
+actions = [action, action, action, action, action]
 while True:
     paused = True
     paused = pause_game(paused)
-    restart()
-#     for a in actions:
-#         print(1)
-#         take_action(a)
-#         # time.sleep(0.1)
+    for a in actions:
+        print(1)
+        take_action(a)
 
 
 
 
 
 
-
-window_size = (0,0,1920,1017)
-station_size = (230, 230, 1670, 930)
-WIDTH = 1000
-HEIGHT = 500
+# window_size = (0,0,1920,1017)
+# station_size = (230, 230, 1670, 930)
+# WIDTH = 768
+# HEIGHT = 407
 
 # hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
 # boss_blood = boss_hp(hp_station, 570)
 # last_hp = boss_blood
-# next_self_blood = player_hp(hp_station)
+# next_self_blood  = player_hp(hp_station)
 
 # min_hp = 9
 
 # check_point = (612, 187)
 # while True:
-#     # hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
-#     station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-#     # next_boss_blood = boss_hp(hp_station, last_hp)
+#     hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
+#     # print(hp_station[401][386], " ", hp_station[401][387]," ", hp_station[401][388])
+#     # station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
+#     next_boss_blood = boss_hp(hp_station, last_hp)
+#     print(next_boss_blood)
 #     # print(boss_blood)
 #     # last_hp = boss_blood
 #     # boss_blood = next_boss_blood
 #     # print(hp_station[95][40])
+#     # if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
+#     #     # print("Not in game yet")
+#     #     continue
 #     # next_self_blood = player_hp(hp_station)
 #     # if next_self_blood - min_hp < 0 and next_self_blood - min_hp > -3:
 #     #     print(next_self_blood)
-#     #     print("----------------------------------------")
 #     #     min_hp = next_self_blood
 #     # if next_self_blood ==9 and min_hp != 9:
-#     #     # print("----------------------------------------")
-#     # min_hp = 9
-#     # cv2.circle(station, check_point, 5, (255, 0, 0), 4, 1)
-#     print(station[187][612])
-#     # cv2.imshow( "ss", station)
+#     #     print("----------------------------------------")
+#     #     min_hp = 9
+#     # cv2.circle(hp_station, (95, 40), 5, (255, 0, 0), 4, 1)
+#     # cv2.line(hp_station,(96, 400), (666, 400), (255, 255, 255), 4, 1)
+#     # print(station[187][612])
+#     # cv2.imshow( "ss", hp_station)
 
 
 

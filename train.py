@@ -13,7 +13,7 @@ from ReplayMemory import ReplayMemory
 
 
 import Tool.Helper
-from Tool.Helper import mean
+from Tool.Helper import mean, is_end
 from Tool.Actions import take_action, restart
 from Tool.WindowsAPI import grab_screen
 from Tool.GetHP import boss_hp, player_hp
@@ -70,7 +70,7 @@ ACTION_SEQ = 3
 #         last_time = time.time()
 #         step += 1
 #         action = user.get_user_action()
-#         next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2BGR),(WIDTH,HEIGHT))
+#         next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
 #         next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
 #         next_boss_blood = boss_hp(next_hp_station, last_hp)
@@ -127,34 +127,43 @@ def run_episode(algorithm,agent,rpm,PASS_COUNT,paused):
     DeleyStation = collections.deque(maxlen=DELEY_REWARD)
     DeleyActions = collections.deque(maxlen=DELEY_REWARD)
     while True:
+
+        if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
+          # print("Not in game yet")
+            continue
         last_time = time.time()
         step += 1
 
         actions = agent.sample(station)
+        # 从动作序列中使用动作
         for action in actions:
-            #take_action(action)
-            next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-            next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+            take_action(action)
+            print("Action: ", action_name[action])
 
-            next_boss_blood = boss_hp(next_hp_station, last_hp)
-            last_hp = boss_blood
-
-            next_self_blood = player_hp(next_hp_station)
-
-            if(next_self_blood != min_hp):
-                print(next_self_blood)
-
-            reward, done, min_hp = Tool.Helper.action_judge(boss_blood, next_boss_blood,self_blood, next_self_blood, min_hp)
-            if done == 1:
+            temp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+            temp_boss_hp = boss_hp(temp_station, last_hp)
+            temp_self_hp = player_hp(temp_station)
+            if is_end(temp_self_hp, min_hp, temp_boss_hp, boss_blood):
                 break
-            elif done == 2:
-                PASS_COUNT += 1
-                break
+
+        next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
+        next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+
+        next_boss_blood = boss_hp(next_hp_station, last_hp)
+            # print(next_boss_blood)
+        last_hp = boss_blood
+
+        next_self_blood = player_hp(next_hp_station)
+
+            # if(next_self_blood != min_hp):
+            #     print(next_self_blood)
+
+        reward, done, min_hp = Tool.Helper.action_judge(boss_blood, next_boss_blood,self_blood, next_self_blood, min_hp)
         DeleyReward.append(reward)
         DeleyStation.append(station)
         DeleyActions.append(actions)
         reward = mean(DeleyReward)
-
+        print(reward)
         # if(abs(reward) > 7):
         #     print("---------------------------")
         #     for i in range(ACTION_SEQ):
