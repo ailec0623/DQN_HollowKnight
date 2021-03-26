@@ -31,19 +31,19 @@ INPUT_SHAPE = (HEIGHT, WIDTH, 3)
 
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
-MEMORY_SIZE = 500  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 200  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
+MEMORY_WARMUP_SIZE = 100  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
 BATCH_SIZE = 32  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
 action_name = ["Nothing", "Move_Left", "Move_Right", "Attack_Left", "Attack_Right", "Attack_Up",
-           "Short_Jump", "Mid_Jump", "Skill_Down", "Skill_Left", 
-           "Skill_Right", "Skill_Up", "Rush_Left", "Rush_Right", "Cure"]
+           "Short_Jump", "Mid_Jump", "Skill_Left", "Skill_Right", 
+           "Skill_Up", "Skill_Down", "Rush_Left", "Rush_Right", "Cure"]
 
 USER = False
 DELEY_REWARD = 2
-ACTION_SEQ = 4
+ACTION_SEQ = 3
 
 # def user_run(algorithm,user,rpm,PASS_COUNT,paused):
 #     restart()
@@ -109,7 +109,7 @@ ACTION_SEQ = 4
 def run_episode(algorithm,agent,rpm,PASS_COUNT,paused):
     restart()
     
-    station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2BGR),(WIDTH,HEIGHT))
+    station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
     hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
     boss_blood = boss_hp(hp_station, 570)
@@ -132,27 +132,34 @@ def run_episode(algorithm,agent,rpm,PASS_COUNT,paused):
 
         actions = agent.sample(station)
         for action in actions:
-            take_action(action)
+            #take_action(action)
+            next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
+            next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
-        next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2BGR),(WIDTH,HEIGHT))
-        next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+            next_boss_blood = boss_hp(next_hp_station, last_hp)
+            last_hp = boss_blood
 
-        next_boss_blood = boss_hp(next_hp_station, last_hp)
-        last_hp = boss_blood
+            next_self_blood = player_hp(next_hp_station)
 
-        next_self_blood = player_hp(next_hp_station)
+            if(next_self_blood != min_hp):
+                print(next_self_blood)
 
-        reward, done, min_hp = Tool.Helper.action_judge(boss_blood, next_boss_blood,self_blood, next_self_blood, min_hp)
+            reward, done, min_hp = Tool.Helper.action_judge(boss_blood, next_boss_blood,self_blood, next_self_blood, min_hp)
+            if done == 1:
+                break
+            elif done == 2:
+                PASS_COUNT += 1
+                break
         DeleyReward.append(reward)
         DeleyStation.append(station)
         DeleyActions.append(actions)
         reward = mean(DeleyReward)
 
-        if(abs(reward) > 7):
-            print("---------------------------")
-            for i in range(ACTION_SEQ):
-                print(action_name[DeleyActions[0][i]])
-            print("reward: ", reward)
+        # if(abs(reward) > 7):
+        #     print("---------------------------")
+        #     for i in range(ACTION_SEQ):
+        #         print(action_name[DeleyActions[0][i]])
+        #     print("reward: ", reward)
         if len(DeleyReward) >= DELEY_REWARD:
             rpm.append((DeleyStation[0],DeleyActions[0],reward,DeleyStation[1],done))
         if (len(rpm) > MEMORY_WARMUP_SIZE) and (step % LEARN_FREQ == 0):

@@ -1,6 +1,7 @@
 /logs_gpu/
 /model_gpu/
-/back_up/
+/abyss/
 /user_data/
+/memory/
 *.jpg
 *.h5

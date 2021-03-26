@@ -15,9 +15,9 @@ class ReplayMemory:
             self.buffer = collections.deque(maxlen=max_size)
 
     def append(self,exp):
-        count += 1
+        self.count += 1
         self.buffer.append(exp)
-        if count % self.size == 0:
+        if self.count % self.size == 0:
             self.save()
             self.buffer = collections.deque(maxlen=self.size)
 

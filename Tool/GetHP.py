@@ -11,10 +11,10 @@ import numpy as np
 from PIL import ImageGrab
 import cv2
 import time
-from Tool.GrabScreen import grab_screen
+from Tool.WindowsAPI import grab_screen
 import os
 
-x = 129
+x = 130
 y = 50
 step = 22
 points = []
@@ -28,12 +28,41 @@ hp_y = 400
 
 def player_hp(gray):
     hp = 0
-    #print("---------------------------")
-    for point in points:
+    # print("---------------------------")
+    
+    if(gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20):
+        # print(gray[40][95], ", ", gray[300][30], ", ", gray[200][30])
+        return 9
+    for idx, point in enumerate(points):
         x_, y_ = point[0], point[1]
-        #print(gray[y][x])
-        if(gray[y_][x_] > 190):
-            hp+=1
+        pixel = gray[y_][x_] +  gray[y_+1][x_] +gray[y_-1][x_] +gray[y_][x_+1] +gray[y_][x_-1]
+
+        if idx == 0:
+            if pixel == 150:
+                # print(idx, "case 1", pixel)
+                pass
+            elif((pixel > 58 and pixel < 100 )  or (pixel >= 196 and pixel <= 241) or (pixel >= 145 and pixel <= 180)):
+                # print(idx, "case 2", pixel)
+                hp = idx + 1
+            else: 
+                pass
+                # print(idx, "case 3", pixel)
+        else:
+            # print(pixel )
+            if pixel == 150:
+                # print(idx, "case 1", pixel)
+                pass
+            elif((pixel > 60 and pixel < 100 ) or (pixel >= 196 and pixel <= 241) or (pixel >= 144 and pixel <= 180)):
+                # print(idx, "case 2", pixel)
+                hp = idx + 1
+            else: 
+                # print(idx, "case 3", pixel)
+                pass
+                # print(pixel, i)
+
+    # print(hp)
+    if hp == 0:
+        return 1
     return hp
 
 def boss_hp(gray, last_hp):

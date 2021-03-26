@@ -51,7 +51,7 @@ class DQN:
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
         next_pred_value = self.target_model.predict(next_obs)
-        print(next_pred_value.shape)
+        # print(next_pred_value.shape)
         next_pred_value = next_pred_value.reshape((len(reward), self.act_seq, self.act_dim))
         
         best_v = tf.transpose(tf.reduce_max(next_pred_value,axis=2))

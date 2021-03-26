@@ -8,7 +8,7 @@ def mean(d):
     return t / len(d)
 
 def count_self_reward(next_self_blood, min_hp):
-    if next_self_blood - min_hp < 0 and next_self_blood != 0:
+    if next_self_blood - min_hp < 0:
         self_blood_reward = 35 * (next_self_blood - min_hp)
         min_hp = next_self_blood
         return self_blood_reward, min_hp
@@ -24,6 +24,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
     # get action reward
     # Player dead
     if next_self_blood - self_blood > 5:     
+        
         reward = -35
         done = 1
         min_hp = 9
@@ -31,6 +32,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
         return reward, done, min_hp
     #boss dead
     elif next_boss_blood - boss_blood > 200:   
+
         reward = 30
         done = 2
         min_hp = 9
