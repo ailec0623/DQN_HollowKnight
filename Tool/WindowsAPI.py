@@ -4,9 +4,10 @@ import win32gui, win32ui, win32con, win32api
 
 
 
-
+# get hollow knight hwnd
 hwnd = win32gui.FindWindow(None,'Hollow Knight')
 
+# get windows image of hollow knight
 def grab_screen(region=None):
   
 
@@ -40,6 +41,7 @@ def grab_screen(region=None):
     return img
   
 
+# win32 presskey and releasekey, but it has lag, what we need is in SendKey.py
 def PressKey( hexKeyCode):
     win32api.keybd_event(hexKeyCode, 0, win32con.KEYEVENTF_EXTENDEDKEY, 0)
 
@@ -47,7 +49,7 @@ def PressKey( hexKeyCode):
 def ReleaseKey( hexKeyCode):
     win32api.keybd_event(hexKeyCode, 0, win32con.KEYEVENTF_KEYUP, 0)
 
-
+# check which key is pressed
 def key_check():
     operations = []
     if win32api.GetAsyncKeyState(0x41):

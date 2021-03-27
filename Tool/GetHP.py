@@ -25,14 +25,14 @@ MAX_BOSS_HP = 570
 hp_y = 401
 
 
-
+# count player hp, it is really hard to change, but you have to
 def player_hp(gray):
     hp = 0
     case = 0
     
-    if(gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20):
+    if(gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20 and gray[400][30] > 20):
         # print(gray[40][95], ", ", gray[300][30], ", ", gray[200][30])
-        case = 0
+        print("HP abnormal 0")
         return 9
     for idx, point in enumerate(points):
         x_, y_ = point[0], point[1]
@@ -42,9 +42,8 @@ def player_hp(gray):
             if pixel == 150:
                 # print(idx, "case 1", pixel)
                 break
-            elif((pixel > 58 and pixel < 100 )  or (pixel >= 196 and pixel <= 241) or (pixel >= 145 and pixel <= 180)):
+            elif(pixel > 58 and pixel < 244 ) :
                 # print(idx, "case 2", pixel)
-                case = 2
                 hp = idx + 1
             else: 
                 pass
@@ -65,17 +64,20 @@ def player_hp(gray):
 
     # print(hp)
     if hp == 0:
-        case = 4
+        print("HP abnormal 1")
+        print(gray[50][130])
         return 1
     # print(case)
     return hp
 
+# count boss hp, it is really hard to change, but you have to
 def boss_hp(gray, last_hp):
     boss_blood = 0
 
     #print(gray[hp_y][97],gray[hp_y][200],gray[hp_y][400])
     # print(gray[hp_y][100],gray[hp_y][200],gray[hp_y][300])
-    if(gray[hp_y][98] != 0 or gray[hp_y][200] == 0):
+    # no boss hp bar or all the bar is black
+    if((gray[hp_y][98] != 0 and gray[hp_y][98] != 62)or (gray[hp_y][100] == 0 and gray[hp_y][400] == 0 and gray[hp_y][450] == 0)):
         # print("case 1")
         return MAX_BOSS_HP
 

@@ -17,50 +17,43 @@ C = 0x43
 X = 0x58
 Z = 0x5A
 
+# move actions
 # 0
 def Nothing():
-    # print("Do nothing--->")
+    ReleaseKey(DOWN_ARROW)
+    ReleaseKey(UP_ARROW)
     time.sleep(0.1)
     pass
 
 # Move
 # 1
 def Move_Left():
-    # print("Move left--->")
     PressKey(LEFT_ARROW)
-    time.sleep(0.2)
-    ReleaseKey(LEFT_ARROW)
     time.sleep(0.05)
 # 2
 def Move_Right():
-    # print("Move right--->")
     PressKey(RIGHT_ARROW)
-    time.sleep(0.2)
-    ReleaseKey(RIGHT_ARROW)
     time.sleep(0.05)
 
+# ----------------------------------------------------------------------
+
+# other actions
 # Attack
-# 3
-def Attack_Left():
-    # print("Attack left--->")
-    PressKey(LEFT_ARROW)
-    time.sleep(0.08)
-    ReleaseKey(LEFT_ARROW)
-
+# 0
+def Attack():
     PressKey(X)
+    time.sleep(0.08)
     ReleaseKey(X)
     time.sleep(0.2)
-# 4
-def Attack_Right():
-    # print("Attack right--->")
-    PressKey(RIGHT_ARROW)
-    time.sleep(0.08)
-    ReleaseKey(RIGHT_ARROW)
-
+# 1
+def Attack_Down():
+    PressKey(DOWN_ARROW)
     PressKey(X)
+    time.sleep(0.07)
     ReleaseKey(X)
+    ReleaseKey(DOWN_ARROW)
     time.sleep(0.2)
-# 5
+# 2
 def Attack_Up():
     # print("Attack up--->")
     PressKey(UP_ARROW)
@@ -70,14 +63,14 @@ def Attack_Up():
     ReleaseKey(UP_ARROW)
     time.sleep(0.2)
 
-#JUMP, actions below can ignore in a simple model for a easy BOSS
-# 6
+#JUMP
+# 3
 def Short_Jump():
     PressKey(C)
     time.sleep(0.1)
     ReleaseKey(C)
     time.sleep(0.05)
-# 7
+# 4
 def Mid_Jump():
     PressKey(C)
     time.sleep(0.5)
@@ -85,29 +78,15 @@ def Mid_Jump():
     time.sleep(0.05)
 
 # Skill
-# 8
-def Skill_Left():
-    PressKey(LEFT_ARROW)
-    time.sleep(0.08)
+# 5
+def Skill():
     PressKey(Z)
     PressKey(X)
     time.sleep(0.2)
-    ReleaseKey(LEFT_ARROW)
     ReleaseKey(Z)
     ReleaseKey(X)
     time.sleep(0.1)
-# 9
-def Skill_Right():
-    PressKey(RIGHT_ARROW)
-    time.sleep(0.08)
-    PressKey(Z)
-    PressKey(X)
-    time.sleep(0.2)
-    ReleaseKey(RIGHT_ARROW)
-    ReleaseKey(Z)
-    ReleaseKey(X)
-    time.sleep(0.1)
-# 10
+# 6
 def Skill_Up():
     PressKey(UP_ARROW)
     PressKey(Z)
@@ -122,7 +101,7 @@ def Skill_Up():
     time.sleep(0.1)
     ReleaseKey(X)
     time.sleep(0.1)
-# 11
+# 7
 def Skill_Down():
     PressKey(DOWN_ARROW)
     PressKey(Z)
@@ -141,27 +120,16 @@ def Skill_Down():
 
 
 # Rush
-# 12
-def Rush_Left():
-    PressKey(LEFT_ARROW)
+# 8
+def Rush():
     PressKey(L_SHIFT)
     time.sleep(0.45)
-    ReleaseKey(LEFT_ARROW)
     ReleaseKey(L_SHIFT)
     time.sleep(0.05)
-# 13
-def Rush_Right():
-    PressKey(RIGHT_ARROW)
-    PressKey(L_SHIFT)
-    time.sleep(0.45)
-    ReleaseKey(RIGHT_ARROW)
-    ReleaseKey(L_SHIFT)
-    time.sleep(0.01)
 
 
 
 # Cure
-#14
 def Cure():
     PressKey(A)
     time.sleep(1.4)
@@ -179,7 +147,13 @@ def Look_up():
 
 def restart():
     station_size = (230, 230, 1670, 930)
-    time.sleep(5)
+    while True:
+        station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
+        if station[187][300][0] != 0: 
+            time.sleep(1)
+        else:
+            break
+    time.sleep(1)
     Look_up()
     time.sleep(2.5)
     Look_up()
@@ -195,9 +169,9 @@ def restart():
 
 
 # List for action functions
-Actions = [Nothing, Move_Left, Move_Right, Attack_Left, Attack_Right, Attack_Up,
-           Short_Jump, Mid_Jump, Skill_Left, Skill_Right, Skill_Up, 
-           Skill_Down, Rush_Left, Rush_Right, Cure]
+Actions = [Attack, Attack_Down, Attack_Up,
+           Short_Jump, Mid_Jump, Skill, Skill_Up, 
+           Skill_Down, Rush, Cure]
 
 # Run the action
 def take_action(action):

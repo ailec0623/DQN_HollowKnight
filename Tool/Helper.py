@@ -2,20 +2,22 @@ from Tool.WindowsAPI import key_check
 import time
 
 
+# check whether a game is end
 def is_end(next_self_blood, min_hp, next_boss_blood, boss_blood):
-    if next_self_blood ==9 and min_hp <= 1:    
+    if next_self_blood ==9 and min_hp <= 3:    
         return True
     elif next_boss_blood - boss_blood > 200:   
         return True
     return False
 
-
+# get mean score of a reward seq
 def mean(d):
     t = 0
     for i in d:
         t += i
     return t / len(d)
 
+# count play hp change, and give reward 
 def count_self_reward(next_self_blood, min_hp):
     if next_self_blood - min_hp < 0:
         self_blood_reward = 35 * (next_self_blood - min_hp)
@@ -23,16 +25,18 @@ def count_self_reward(next_self_blood, min_hp):
         return self_blood_reward, min_hp
     return 0, min_hp
 
+# count boss hp change, and give reward 
 def count_boss_reward(next_boss_blood, boss_blood):
     if abs(next_boss_blood - boss_blood) > 3:
         # boss_blood_reward = 30
         return boss_blood - next_boss_blood
     return 0
 
+# JUDGEMENT FUNCTION, write yourself
 def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_hp):
     # get action reward
     # Player dead
-    if next_self_blood ==9 and min_hp <= 1:    
+    if next_self_blood ==9 and min_hp <= 3:    
         
         reward = -35
         done = 1

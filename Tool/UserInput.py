@@ -3,7 +3,8 @@ import random
 
 
 
-
+#map user input into action space
+#no need anymore
 
 
 class User:
