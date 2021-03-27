@@ -11,9 +11,9 @@ class Agent:
         self.e_greed_decrement = e_greed_decrement
 
 
-    def sample(self, station):
+    def act_sample(self, station):
         # print("self.e_greed: ", self.e_greed)
-        acts = self.predict(station)
+        acts = self.act_predict(station)
         for i in range(self.act_seq):
             sample = np.random.rand()  # 产生0~1之间的小数
             if sample < self.e_greed:
@@ -23,9 +23,9 @@ class Agent:
             0.05, self.e_greed - self.e_greed_decrement)  # 随着训练逐步收敛，探索的程度慢慢降低
         return acts
     
-    def predict(self,station):
+    def act_predict(self,station):
         station = tf.expand_dims(station,axis=0)
-        actions = self.algorithm.model.predict(station)
+        actions = self.algorithm.act_model.predict(station)
         # print(actions.shape)
         actions = actions.reshape((self.act_seq, self.act_dim))
         acts = []
@@ -33,3 +33,19 @@ class Agent:
             acts.append(np.argmax(actions[i]))
         # print(action)
         return acts
+
+
+    def move_sample(self, obs):
+        sample = np.random.rand()  # 产生0~1之间的小数
+        if sample < self.e_greed:
+            act = np.random.randint(3)  # 探索：每个动作都有概率被选择
+        else:
+            act = self.move_predict(obs)  # 选择最优动作
+        self.e_greed = max(
+            0.01, self.e_greed - self.e_greed_decrement)  # 随着训练逐步收敛，探索的程度慢慢降低
+        return act
+    
+    def move_predict(self,obs):
+        obs = tf.expand_dims(obs,axis=0)
+        action = self.algorithm.move_model.predict(obs)
+        return np.argmax(action)

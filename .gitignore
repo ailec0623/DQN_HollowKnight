@@ -2,6 +2,9 @@
 /model_gpu/
 /abyss/
 /user_data/
-/memory/
+/act_memory/
+/move_memory/
+/__pycache__/
+/OLD_FILE/
 *.jpg
 *.h5

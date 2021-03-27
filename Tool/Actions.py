@@ -20,18 +20,22 @@ Z = 0x5A
 # move actions
 # 0
 def Nothing():
-    ReleaseKey(DOWN_ARROW)
-    ReleaseKey(UP_ARROW)
+    ReleaseKey(LEFT_ARROW)
+    ReleaseKey(RIGHT_ARROW)
     time.sleep(0.1)
     pass
 
 # Move
 # 1
 def Move_Left():
+    ReleaseKey(RIGHT_ARROW)
+    time.sleep(0.03)
     PressKey(LEFT_ARROW)
     time.sleep(0.05)
 # 2
 def Move_Right():
+    ReleaseKey(LEFT_ARROW)
+    time.sleep(0.03)
     PressKey(RIGHT_ARROW)
     time.sleep(0.05)
 

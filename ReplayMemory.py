@@ -5,21 +5,19 @@ import pickle
 import os
 
 class ReplayMemory:
-    def __init__(self,max_size,file_name=None,user=False):
+    def __init__(self,max_size,file_name,user=False):
         self.user = user
         self.size = max_size
         self.count = 0
-        if file_name:
-            self.buffer = load(file_name)
-        else:
-            self.buffer = collections.deque(maxlen=max_size)
+        self.file_name = file_name
+        self.buffer = collections.deque(maxlen=max_size)
 
     def append(self,exp):
         self.count += 1
         self.buffer.append(exp)
+        # save to file
         if self.count % self.size == 0:
-            self.save()
-            self.buffer = collections.deque(maxlen=self.size)
+            self.save(self.file_name)
 
 
 
@@ -39,16 +37,17 @@ class ReplayMemory:
             np.array(action_batch).astype('int32'), np.array(reward_batch).astype('float32'),\
             np.array(next_obs_batch).astype('float32'), np.array(done_batch).astype('float32')
 
-    def save(self):
+    def save(self,file_name):
         count = 0
-        for x in os.listdir('./memory/'):
+        for x in os.listdir(file_name):
             count += 1
-        file_name = "./memory/memory_" + str(count) +".txt"
+        file_name = file_name + "/memory_" + str(count) +".txt"
         pickle.dump(self.buffer, open(file_name, 'wb'))
         print("Save memory:", file_name)
 
-    def load(file_name):
-        return pickle.load(open(file_name, 'rb'))
+    def load(self, file_name):
+        self.buffer = pickle.load(open(file_name, 'rb'))
+        return self.buffer
 
     def __len__(self):
         return len(self.buffer)

@@ -11,17 +11,18 @@ import os
 
 
 
-action = 11
-# actions = [13,13, 3,3, 7,6, 12,6, 10, 4,4]
-actions = [action, action, action, action, action]
-while True:
-    paused = True
-    paused = pause_game(paused)
-    for a in actions:
-        print(1)
-        take_action(a)
+# action = 11
+# # actions = [13,13, 3,3, 7,6, 12,6, 10, 4,4]
+# actions = [action, action, action, action, action]
+# while True:
+#     paused = True
+#     paused = pause_game(paused)
+#     for a in actions:
+#         print(1)
+#         take_action(a)
 
-
+for x in os.listdir("./act_memory"):
+    print(1)
 
 
 
@@ -40,11 +41,12 @@ while True:
 
 # check_point = (612, 187)
 # while True:
-#     hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
-#     # print(hp_station[401][386], " ", hp_station[401][387]," ", hp_station[401][388])
+#     hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
+#     # print(hp_station[401][97], " ", hp_station[401][98]," ", hp_station[401][99])
 #     # station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-#     next_boss_blood = boss_hp(hp_station, last_hp)
-#     print(next_boss_blood)
+#     print(hp_station[187][300])
+#     # next_boss_blood = boss_hp(hp_station, last_hp)
+#     # print(next_boss_blood)
 #     # print(boss_blood)
 #     # last_hp = boss_blood
 #     # boss_blood = next_boss_blood
@@ -59,10 +61,10 @@ while True:
 #     # if next_self_blood ==9 and min_hp != 9:
 #     #     print("----------------------------------------")
 #     #     min_hp = 9
-#     # cv2.circle(hp_station, (95, 40), 5, (255, 0, 0), 4, 1)
+#     cv2.circle(hp_station, (300, 187), 5, (255, 0, 0), 4, 1)
 #     # cv2.line(hp_station,(96, 400), (666, 400), (255, 255, 255), 4, 1)
 #     # print(station[187][612])
-#     # cv2.imshow( "ss", hp_station)
+#     cv2.imshow( "ss", hp_station)
 
 
 
