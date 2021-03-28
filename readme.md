@@ -34,8 +34,8 @@
 - GetHp help us calculate our hp and boss hp (it may have some bugs, you can fix it by yourself)
 - SendKey is the API we use to send keyboard event to windows system.
 - UserInput is an useless file, which I used it to train my model manually.
-- WindowsAPI is used to get screenshot of the game.
-- Helper defines [Jugment] fucntion, and other functions we may use
+- WindowsAPI is used to get screenshot of the game, and key_check() is used to check which key is pressed.
+- Helper defines [Reward Jugment] fucntion, and other functions we may use
 
 ## Changes
 
