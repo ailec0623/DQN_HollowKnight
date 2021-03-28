@@ -42,7 +42,7 @@ class Agent:
         else:
             act = self.move_predict(obs)  # 选择最优动作
         self.e_greed = max(
-            0.01, self.e_greed - self.e_greed_decrement)  # 随着训练逐步收敛，探索的程度慢慢降低
+            0.05, self.e_greed - self.e_greed_decrement)  # 随着训练逐步收敛，探索的程度慢慢降低
         return act
     
     def move_predict(self,obs):

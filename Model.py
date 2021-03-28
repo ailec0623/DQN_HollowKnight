@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras import layers,models, regularizers
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization
+
 class Model:
     def __init__(self, input_shape, act_dim, action_seq):
         self.act_dim = act_dim
