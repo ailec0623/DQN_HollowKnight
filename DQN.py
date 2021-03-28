@@ -2,6 +2,7 @@ import tensorflow as tf
 
 class DQN:
     def __init__(self,model,gamma=0.9,learnging_rate=0.01):
+        self.model = model
         self.act_dim = model.act_dim
         self.act_seq = model.act_seq
         self.act_model = model.act_model
@@ -39,6 +40,7 @@ class DQN:
             loss = self.act_model.loss_func(labels,pred_action_value)
         gradients = tape.gradient(loss,self.act_model.trainable_variables)
         self.act_model.optimizer.apply_gradients(zip(gradients,self.act_model.trainable_variables))
+        self.model.act_loss.append(loss)
         # self.act_model.train_loss.update_state(loss)
     def act_train_model(self,action,features,labels,epochs=1):
         """ 训练模型
@@ -112,6 +114,7 @@ class DQN:
             loss = self.move_model.loss_func(labels,pred_action_value)
         gradients = tape.gradient(loss,self.move_model.trainable_variables)
         self.move_model.optimizer.apply_gradients(zip(gradients,self.move_model.trainable_variables))
+        self.model.move_loss.append(loss)
         # self.move_model.train_loss.update_state(loss)
     def move_train_model(self,action,features,labels,epochs=1):
         """ 训练模型
@@ -133,7 +136,7 @@ class DQN:
         terminal = tf.cast(terminal,dtype=tf.float32)
         target = reward + self.gamma * (1.0 - terminal) * best_v
 
-        self.move_train_model(action[i],obs,target,epochs=1)
+        self.move_train_model(action,obs,target,epochs=1)
         self.move_global_step += 1
         # print('finish')
     def move_replace_target(self):
@@ -154,3 +157,6 @@ class DQN:
         self.move_target_model.get_layer(name='d3').set_weights(self.move_model.get_layer(name='d3').get_weights())
         self.move_target_model.get_layer(name='dp1').set_weights(self.move_model.get_layer(name='dp1').get_weights())
         self.move_target_model.get_layer(name='dp2').set_weights(self.move_model.get_layer(name='dp2').get_weights())
+
+
+

@@ -8,7 +8,9 @@ class Model:
         self.act_seq = action_seq
         self.input_shape = input_shape
         self._build_model()
-    
+        self.act_loss = []
+        self.move_loss = []
+
     def load_model(self):
         self.act_model = load_model('dqn_act_model.h5')
         self.move_model = load_model('dqn_move_model.h5')

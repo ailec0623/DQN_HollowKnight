@@ -5,6 +5,7 @@ import os
 import cv2
 import time
 import collections
+import matplotlib.pyplot as plt
 
 from Model import Model
 from DQN import DQN
@@ -33,8 +34,8 @@ INPUT_SHAPE = (HEIGHT, WIDTH, 3)
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 150  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 64  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+MEMORY_WARMUP_SIZE = 32  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+BATCH_SIZE = 32  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
@@ -47,6 +48,8 @@ move_name = ["Nothing", "Move_Left", "Move_Right"]
 USER = False
 DELEY_REWARD = 2
 ACTION_SEQ = 3
+
+
 
 def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     restart()
@@ -97,8 +100,8 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
         last_time = time.time()
         # no more than 10 mins
-        if time.time() - start_time > 600:
-            break
+        # if time.time() - start_time > 600:
+        #     break
 
         step += 1
 
@@ -108,7 +111,8 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         # execute action in action seq
         for action in actions:
             d = agent.move_sample(move_station)
-            print("Move:", move_name[d] )
+            # print("Move:", move_name[d] )
+
             if d == direction:
                 pass
             elif d == 0:
@@ -119,7 +123,8 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
                 Tool.Actions.Move_Right()
 
             take_action(action)
-            print("Action: ", action_name[action])
+
+            # print("Action: ", action_name[action])
 
             next_move_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
             next_move_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
@@ -132,12 +137,11 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
                 next_move_self_hp = 9
 
             reward, done, min_hp = Tool.Helper.action_judge(move_boss_hp, next_move_boss_hp,move_self_hp, next_move_self_hp, min_hp)
+            # print(reward)
+
+            move_rmp.append((move_station, d, reward, next_move_station,done))
 
 
-
-            if (len(move_rmp) > MEMORY_WARMUP_SIZE) and (step % LEARN_FREQ == 0):
-                batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
-                algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)
 
             if done == 1:
                 Tool.Actions.Nothing()
@@ -178,13 +182,10 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         DeleyStation.append(act_station)
         DeleyActions.append(actions)
         reward = mean(DeleyReward)
-        print("reward: ",reward,"self_hp: ",next_act_self_hp,"boss_hp: ",next_act_boss_hp)
+        # print("reward: ",reward,"self_hp: ",next_act_self_hp,"boss_hp: ",next_act_boss_hp)
 
         if len(DeleyReward) >= DELEY_REWARD:
             act_rmp.append((DeleyStation[0],DeleyActions[0],reward,DeleyStation[1],done))
-        if (len(act_rmp) > MEMORY_WARMUP_SIZE) and (step % LEARN_FREQ == 0):
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
         
         total_reward += reward
         paused = Tool.Helper.pause_game(paused)
@@ -201,7 +202,15 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         act_self_hp = next_act_self_hp
         act_boss_hp = next_act_boss_hp
 
-        
+    if (len(move_rmp) > MEMORY_WARMUP_SIZE):
+        print("move learning")
+        batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
+        algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
+
+    if (len(act_rmp) > MEMORY_WARMUP_SIZE):
+        print("act learning")
+        batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
+        algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
     return total_reward, step, PASS_COUNT
 
@@ -213,7 +222,7 @@ if __name__ == '__main__':
 
     act_rpm = ReplayMemory(MEMORY_SIZE, file_name='./act_memory', user = USER)         # experience pool
     move_rpm = ReplayMemory(MEMORY_SIZE,file_name='./move_memory', user = USER)         # experience pool
-
+    
     # new model, if exit save file, load it
     model = Model(INPUT_SHAPE, ACTION_DIM, ACTION_SEQ)  
     if os.path.exists('dqn_act_model.h5'):
@@ -242,7 +251,7 @@ if __name__ == '__main__':
             model.save_mode()
         else:
             total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rpm,move_rpm, PASS_COUNT, paused)
-            if episode % 10 == 9:
+            if episode % 10 == 1:
                 model.save_mode()
         print("Episode: ", episode, ", mean(reward):", total_reward/total_step,", pass_count: " , PASS_COUNT)
 

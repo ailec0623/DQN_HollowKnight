@@ -32,7 +32,7 @@ def player_hp(gray):
     
     if(gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20 and gray[400][30] > 20):
         # print(gray[40][95], ", ", gray[300][30], ", ", gray[200][30])
-        print("HP abnormal 0")
+        # print("HP abnormal 0")
         return 9
     for idx, point in enumerate(points):
         x_, y_ = point[0], point[1]
@@ -53,7 +53,7 @@ def player_hp(gray):
             if pixel == 150:
                 # print(idx, "case 1", pixel)
                 pass
-            elif((pixel > 60 and pixel < 100 ) or (pixel >= 196 and pixel <= 241) or (pixel >= 144 and pixel <= 180)):
+            elif((pixel > 60 and pixel < 115 ) or (pixel >= 196 and pixel <= 241) or (pixel >= 144 and pixel <= 180)):
                 # print(idx, "case 2", pixel)
                 case = 3
                 hp = idx + 1
@@ -64,8 +64,6 @@ def player_hp(gray):
 
     # print(hp)
     if hp == 0:
-        print("HP abnormal 1")
-        print(gray[50][130])
         return 1
     # print(case)
     return hp

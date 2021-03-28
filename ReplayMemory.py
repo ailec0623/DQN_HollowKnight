@@ -16,8 +16,8 @@ class ReplayMemory:
         self.count += 1
         self.buffer.append(exp)
         # save to file
-        if self.count % self.size == 0:
-            self.save(self.file_name)
+        # if self.count % self.size == 0:
+        #     self.save(self.file_name)
 
 
 
