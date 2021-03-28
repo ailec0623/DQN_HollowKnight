@@ -6,6 +6,7 @@
 /act_memory/
 /move_memory/
 /__pycache__/
+./__pycache__
 /OLD_FILE/
 *.jpg
 *.h5
