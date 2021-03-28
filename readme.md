@@ -8,7 +8,7 @@
 - python liberary: find in requirments.txt
 - Hollow Knight
 - HP Bar mod for Hollow Knight (In order to get the boss hp to calculate the reward, please find the mod in /hollow_knight_Data/, and then copy the mod file to the game folder)
-- CUDA adn cudnn for tensorflow
+- CUDA and cudnn for tensorflow
 
 ## Usage
 
