@@ -17,7 +17,7 @@
 - Run train.py
 - Keep the game window at the forefront (Since I cannot send keyboard event in the background, I tried PossMassage() in win32 API, but it did not work well.
                                          If you have any idea about sending keyboard event in the background, please let me know)
-- Let the little knight stand in front of the statue of the boss of the godhome
+- Let the little knight stand in front of the statue of the boss in the godhome
 - Press F1 to start train. (Also you can use F1 to stop trainning)
 
 
