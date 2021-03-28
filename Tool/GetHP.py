@@ -8,7 +8,6 @@ For different game and resolution, you need to modify this file to make sure it 
 """
 
 import numpy as np
-from PIL import ImageGrab
 import cv2
 import time
 from Tool.WindowsAPI import grab_screen
