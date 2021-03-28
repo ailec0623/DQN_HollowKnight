@@ -9,8 +9,41 @@ from Tool.Actions import take_action, restart
 from Tool.Helper import pause_game
 import os
 
+from Model import Model
 
 
+
+
+ACTION_DIM = 9
+INPUT_SHAPE = (200, 400, 3)
+ACTION_SEQ = 3
+
+model = Model(INPUT_SHAPE, ACTION_DIM, ACTION_SEQ)
+
+print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights()))
+print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights()))
+
+print(len(model.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).get_weights()))
+print(len(model.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).get_weights()))
+
+print(len(model.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).get_weights()))
+print(len(model.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).get_weights()))
+
+print(len(model.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).get_weights()))
+print(len(model.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).get_weights()))
+
+print(len(model.act_model.get_layer(index=8).get_layer(index=0).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=8).get_layer(index=0).get_layer(index=1).get_weights()))
+print(len(model.act_model.get_layer(index=8).get_layer(index=1).get_layer(index=0).get_weights()))
+print(len(model.act_model.get_layer(index=8).get_layer(index=1).get_layer(index=1).get_weights()))
 # action = 11
 # # actions = [13,13, 3,3, 7,6, 12,6, 10, 4,4]
 # actions = [action, action, action, action, action]
@@ -21,8 +54,8 @@ import os
 #         print(1)
 #         take_action(a)
 
-for x in os.listdir("./act_memory"):
-    print(1)
+# for x in os.listdir("./act_memory"):
+#     print(1)
 
 
 

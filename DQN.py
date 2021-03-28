@@ -53,9 +53,8 @@ class DQN:
         """
         # print('learning')
         # 每隔200个training steps同步一次model和target_model的参数
-        if self.act_global_step % self.update_target_steps == 0:
-            # print('replace')
-            self.act_replace_target()
+        # if self.act_global_step % self.update_target_steps == 0:
+        #     self.act_replace_target()
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
         next_pred_value = self.act_target_model.predict(next_obs)
@@ -77,23 +76,31 @@ class DQN:
         # print('finish')
     def act_replace_target(self):
         '''预测模型权重更新到target模型权重'''
-        self.act_target_model.get_layer(name='c1').set_weights(self.act_model.get_layer(name='c1').get_weights())
-        self.act_target_model.get_layer(name='c2').set_weights(self.act_model.get_layer(name='c2').get_weights())
-        self.act_target_model.get_layer(name='c3').set_weights(self.act_model.get_layer(name='c3').get_weights())
-        self.act_target_model.get_layer(name='c4').set_weights(self.act_model.get_layer(name='c4').get_weights())
-        self.act_target_model.get_layer(name='b1').set_weights(self.act_model.get_layer(name='b1').get_weights())
-        self.act_target_model.get_layer(name='b2').set_weights(self.act_model.get_layer(name='b2').get_weights())
-        self.act_target_model.get_layer(name='b3').set_weights(self.act_model.get_layer(name='b3').get_weights())
-        self.act_target_model.get_layer(name='p1').set_weights(self.act_model.get_layer(name='p1').get_weights())
-        self.act_target_model.get_layer(name='p2').set_weights(self.act_model.get_layer(name='p2').get_weights())
-        self.act_target_model.get_layer(name='p3').set_weights(self.act_model.get_layer(name='p3').get_weights())
-        self.act_target_model.get_layer(name='f1').set_weights(self.act_model.get_layer(name='f1').get_weights())
-        self.act_target_model.get_layer(name='d1').set_weights(self.act_model.get_layer(name='d1').get_weights())
-        self.act_target_model.get_layer(name='d2').set_weights(self.act_model.get_layer(name='d2').get_weights())
-        self.act_target_model.get_layer(name='d3').set_weights(self.act_model.get_layer(name='d3').get_weights())
-        self.act_target_model.get_layer(name='dp1').set_weights(self.act_model.get_layer(name='dp1').get_weights())
-        self.act_target_model.get_layer(name='dp2').set_weights(self.act_model.get_layer(name='dp2').get_weights())
+        self.act_target_model.get_layer(name='conv1').set_weights(self.act_model.get_layer(name='conv1').get_weights())
 
+        # resnet block1
+        self.act_target_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).set_weights(self.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).set_weights(self.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights())
+        self.act_target_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).set_weights(self.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).set_weights(self.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights())
+        # resnet block2
+        self.act_target_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).set_weights(self.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).set_weights(self.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).get_weights())
+        self.act_target_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).set_weights(self.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).set_weights(self.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).get_weights())
+        # resnet block3
+        self.act_target_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).set_weights(self.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).set_weights(self.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).get_weights())
+        self.act_target_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).set_weights(self.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).set_weights(self.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).get_weights())
+        # resnet block4
+        self.act_target_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).set_weights(self.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).set_weights(self.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).get_weights())
+        self.act_target_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).set_weights(self.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).set_weights(self.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).get_weights())
+        
+        
+        self.act_target_model.get_layer(name='d1').set_weights(self.act_model.get_layer(name='d1').get_weights())
 
 
     # train functions for move_model
@@ -127,8 +134,9 @@ class DQN:
         """
 
         # 每隔200个training steps同步一次model和target_model的参数
-        if self.move_global_step % self.update_target_steps == 0:
-            self.move_replace_target()
+        # if self.move_global_step % self.update_target_steps == 0:
+        #     self.move_replace_target()
+
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
         next_pred_value = self.move_target_model.predict(next_obs)        
@@ -141,22 +149,35 @@ class DQN:
         # print('finish')
     def move_replace_target(self):
         '''预测模型权重更新到target模型权重'''
-        self.move_target_model.get_layer(name='c1').set_weights(self.move_model.get_layer(name='c1').get_weights())
-        self.move_target_model.get_layer(name='c2').set_weights(self.move_model.get_layer(name='c2').get_weights())
-        self.move_target_model.get_layer(name='c3').set_weights(self.move_model.get_layer(name='c3').get_weights())
-        self.move_target_model.get_layer(name='c4').set_weights(self.move_model.get_layer(name='c4').get_weights())
-        self.move_target_model.get_layer(name='b1').set_weights(self.move_model.get_layer(name='b1').get_weights())
-        self.move_target_model.get_layer(name='b2').set_weights(self.move_model.get_layer(name='b2').get_weights())
-        self.move_target_model.get_layer(name='b3').set_weights(self.move_model.get_layer(name='b3').get_weights())
-        self.move_target_model.get_layer(name='p1').set_weights(self.move_model.get_layer(name='p1').get_weights())
-        self.move_target_model.get_layer(name='p2').set_weights(self.move_model.get_layer(name='p2').get_weights())
-        self.move_target_model.get_layer(name='p3').set_weights(self.move_model.get_layer(name='p3').get_weights())
-        self.move_target_model.get_layer(name='f1').set_weights(self.move_model.get_layer(name='f1').get_weights())
+        self.move_target_model.get_layer(name='conv1').set_weights(self.move_model.get_layer(name='conv1').get_weights())
+
+        # resnet block1
+        self.move_target_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).set_weights(self.move_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).set_weights(self.move_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights())
+        self.move_target_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).set_weights(self.move_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).set_weights(self.move_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights())
+        # resnet block2
+        self.move_target_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).set_weights(self.move_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).set_weights(self.move_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).get_weights())
+        self.move_target_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).set_weights(self.move_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).set_weights(self.move_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).get_weights())
+        # resnet block3
+        self.move_target_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).set_weights(self.move_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).set_weights(self.move_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).get_weights())
+        self.move_target_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).set_weights(self.move_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).set_weights(self.move_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).get_weights())
+        # resnet block4
+        self.move_target_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).set_weights(self.move_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).set_weights(self.move_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).get_weights())
+        self.move_target_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).set_weights(self.move_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).set_weights(self.move_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).get_weights())
+        
+        
         self.move_target_model.get_layer(name='d1').set_weights(self.move_model.get_layer(name='d1').get_weights())
-        self.move_target_model.get_layer(name='d2').set_weights(self.move_model.get_layer(name='d2').get_weights())
-        self.move_target_model.get_layer(name='d3').set_weights(self.move_model.get_layer(name='d3').get_weights())
-        self.move_target_model.get_layer(name='dp1').set_weights(self.move_model.get_layer(name='dp1').get_weights())
-        self.move_target_model.get_layer(name='dp2').set_weights(self.move_model.get_layer(name='dp2').get_weights())
 
 
 
+    def replace_target(self):
+        print("replace target")
+        self.move_replace_target()
+        self.act_replace_target()

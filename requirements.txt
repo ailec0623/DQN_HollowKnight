@@ -1,6 +1,7 @@
-pywin32==300
-tensorflow==2.4.1
 matplotlib==3.3.4
+pywin32==300
 opencv_python==4.5.1.48
 numpy==1.19.5
+tensorflow_gpu==2.4.1
+tensorflow==2.4.1
 win32gui==221.6
