@@ -5,6 +5,8 @@ from Tool.SendKey import PressKey, ReleaseKey
 from Tool.WindowsAPI import grab_screen
 import time
 import cv2
+import threading
+
 # Hash code for key we may use: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN
 UP_ARROW = 0x26
 DOWN_ARROW = 0x28
@@ -199,3 +201,17 @@ def take_action(action):
 
 def take_direction(direc):
     Directions[direc]()
+
+
+
+class TackAction(threading.Thread):
+    def __init__(self, threadID, name, direction, action):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.direction = direction
+        self.action = action
+        
+    def run(self):
+        take_direction(self.direction)
+        take_action(self.action)

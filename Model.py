@@ -1,25 +1,24 @@
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras import layers,models, regularizers
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Activation, GlobalAveragePooling2D
-
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Activation, GlobalAveragePooling2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D
 class BasicBlock(layers.Layer):
     def __init__(self,filter_num,name,stride=1, **kwargs):
         super(BasicBlock, self).__init__( **kwargs)
         self.filter_num = filter_num
         self.stride = stride
         self.layers = []
-        self.conv1=layers.Conv2D(filter_num,(3,3),strides=stride,padding='same', name = name+'_1')
+        self.conv1=layers.Conv3D(filter_num,(2,3,3),strides=(1,stride,stride),padding='same', name = name+'_1')
         self.bn1=layers.BatchNormalization()
         self.relu=layers.Activation('relu')
 
-        self.conv2=layers.Conv2D(filter_num,(3,3),strides=1,padding='same', name = name+'_2')
+        self.conv2=layers.Conv3D(filter_num,(2,3,3),strides=1,padding='same', name = name+'_2')
         self.bn2 = layers.BatchNormalization()
         self.layers.append(self.conv1)
         self.layers.append(self.conv2)
         if stride!=1:
             self.downsample=models.Sequential()
-            self.downsample.add(layers.Conv2D(filter_num,(1,1),strides=stride))
+            self.downsample.add(layers.Conv3D(filter_num,(1,1,1),strides=(1,stride,stride)))
         else:
             self.downsample=lambda x:x
 
@@ -91,25 +90,26 @@ class Model:
        # shared part
         shared_model = models.Sequential()
         # pre-process block
-        shared_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
+        shared_model.add(Conv3D(32, (3,3,3),strides=(1,1,1), input_shape=self.input_shape, name='conv1'))
         shared_model.add(BatchNormalization(name='b1'))
         shared_model.add(Activation('relu'))
-        shared_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
+        shared_model.add(MaxPooling3D(pool_size=(2,2,1), strides=1, padding="VALID", name='p1'))
+        
         # resnet blocks
-        shared_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        shared_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        shared_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
-
+        shared_model.add(self.build_resblock(32, 2, name='Resnet_1'))
+        shared_model.add(self.build_resblock(64, 2, name='Resnet_2', stride=2))
+        shared_model.add(self.build_resblock(64, 2, name='Resnet_3', stride=2))
+        shared_model.add(self.build_resblock(128, 2, name='Resnet_4', stride=2))
+        # shared_model.summary()
         self.shared_model = shared_model
         # action model
         act_model = models.Sequential()
         # add shared block
         act_model.add(shared_model)
         # fully connected block
-        act_model.add(GlobalAveragePooling2D())
+        act_model.add(GlobalAveragePooling3D())
         act_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
-        act_model.summary()
+        # act_model.summary()
         self.act_model = act_model
 
         # move model
@@ -117,9 +117,9 @@ class Model:
         # add shared block
         move_model.add(shared_model)
         # fully connected block
-        move_model.add(GlobalAveragePooling2D())
-        move_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
-        move_model.summary()
+        move_model.add(GlobalAveragePooling3D())
+        move_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+        # move_model.summary()
         self.move_model = move_model
 
 
@@ -128,15 +128,15 @@ class Model:
         # ------------------ build target_model ------------------
         shared_target_model = models.Sequential()
         # pre-process block
-        shared_target_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
+        shared_target_model.add(Conv3D(32, (3,3,3),strides=(1,1,1), input_shape=self.input_shape, name='conv1'))
         shared_target_model.add(BatchNormalization(name='b1'))
         shared_target_model.add(Activation('relu'))
-        shared_target_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
+        shared_target_model.add(MaxPooling3D(pool_size=(2,2,1), strides=1, padding="VALID", name='p1'))
         # resnet blocks
-        shared_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        shared_target_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        shared_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        shared_target_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
+        shared_target_model.add(self.build_resblock(32, 2, name='Resnet_1'))
+        shared_target_model.add(self.build_resblock(64, 2, name='Resnet_2', stride=2))
+        shared_target_model.add(self.build_resblock(64, 2, name='Resnet_3', stride=2))
+        shared_target_model.add(self.build_resblock(128, 2, name='Resnet_4', stride=2))
         self.shared_target_model = shared_target_model
 
         # action model
@@ -144,9 +144,9 @@ class Model:
         # add shared block
         act_target_model.add(shared_target_model)
         # fully connected block
-        act_target_model.add(GlobalAveragePooling2D())
+        act_target_model.add(GlobalAveragePooling3D())
         act_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
-        act_target_model.summary()
+        # act_target_model.summary()
         self.act_target_model = act_target_model
 
         # move model
@@ -154,8 +154,8 @@ class Model:
         # add shared block
         move_target_model.add(shared_target_model)
         # fully connected block
-        move_target_model.add(GlobalAveragePooling2D())
-        move_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
-        move_target_model.summary()
+        move_target_model.add(GlobalAveragePooling3D())
+        move_target_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+        # move_target_model.summary()
 
         self.move_target_model = move_target_model

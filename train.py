@@ -17,26 +17,28 @@ from ReplayMemory import ReplayMemory
 import Tool.Helper
 import Tool.Actions
 from Tool.Helper import mean, is_end
-from Tool.Actions import take_action, restart,take_direction
+from Tool.Actions import take_action, restart,take_direction, TackAction
 from Tool.WindowsAPI import grab_screen
 from Tool.GetHP import boss_hp, player_hp
 from Tool.UserInput import User
+from Tool.FrameBuffer import FrameBuffer
 
 window_size = (0,0,1920,1017)
 station_size = (230, 230, 1670, 930)
 
 HP_WIDTH = 768
 HP_HEIGHT = 407
-WIDTH = 400
-HEIGHT = 200
+WIDTH = 200
+HEIGHT = 100
 ACTION_DIM = 9
-INPUT_SHAPE = (HEIGHT, WIDTH, 3)
+FRAMEBUFFERSIZE = 4
+INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 20  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 8  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
-LEARNING_RATE = 0.001  # 学习率
+MEMORY_WARMUP_SIZE = 64  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+BATCH_SIZE = 64  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+LEARNING_RATE = 0.0001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
 action_name = ["Attack", "Attack_Down", "Attack_Up",
@@ -55,19 +57,18 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     
     for i in range(1):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
-            print("move learning")
+            # print("move learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
             algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
 
         if (len(act_rmp) > MEMORY_WARMUP_SIZE):
-            print("action learning")
+            # print("action learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
             algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
 
 
 
-    station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
     hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
     boss_hp_value = boss_hp(hp_station, 570)
@@ -87,7 +88,9 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     DeleyStation = collections.deque(maxlen=DELEY_REWARD)
     DeleyActions = collections.deque(maxlen=DELEY_REWARD)
     DeleyDirection = collections.deque(maxlen=DELEY_REWARD)
-
+    
+    thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE)
+    thread1.start()
     # move direction of player 0 for stay, 1 for left, 2 for right
     while True:
         
@@ -107,14 +110,18 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         # no more than 10 mins
         # if time.time() - start_time > 600:
         #     break
+        while(len(thread1.buffer) < FRAMEBUFFERSIZE):
+            print(len(thread1.buffer))
+            time.sleep(0.1)
+        stations = thread1.get_buffer()
 
-        
-
-        d = agent.move_sample(station)
-        action = agent.act_sample(station)
+        d = agent.move_sample(stations)
+        action = agent.act_sample(stations)
         step += 1
 
         # print("Move:", move_name[d] )
+        # thread2 = TackAction(2, "ActionThread", d, action)
+        # thread2.start()
         take_direction(d)
         take_action(action)
 
@@ -131,14 +138,14 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
         reward, done, min_hp = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, min_hp)
             # print(reward)
-        print( action_name[action], ", ", move_name[d], ", ", reward)
+        # print( action_name[action], ", ", move_name[d], ", ", reward)
 
         DeleyReward.append(reward)
-        DeleyStation.append(station)
+        DeleyStation.append(stations)
         DeleyActions.append(action)
         DeleyDirection.append(d)
 
-        print(mean(DeleyReward))
+        # print(mean(DeleyReward))
 
 
         if len(DeleyReward) >= DELEY_REWARD:
@@ -167,15 +174,15 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
             break
 
 
-
+    thread1.stop()
     for i in range(2):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
-            print("move learning")
+            # print("move learning")
             batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
             algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
 
         if (len(act_rmp) > MEMORY_WARMUP_SIZE):
-            print("action learning")
+            # print("action learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
             algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 

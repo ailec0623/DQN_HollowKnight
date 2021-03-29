@@ -9,17 +9,17 @@ from Tool.Actions import take_action, restart, take_direction
 from Tool.Helper import pause_game
 import os
 
-from Model import Model
+# from Model import Model
 
 
 
 
-ACTION_DIM = 9
-INPUT_SHAPE = (200, 400, 3)
+# ACTION_DIM = 9
+# INPUT_SHAPE = (200, 400, 3)
 
-model = Model(INPUT_SHAPE, ACTION_DIM)
+# model = Model(INPUT_SHAPE, ACTION_DIM)
 
-print(model.act_model.get_layer(index=0).summary())
+# print(model.act_model.get_layer(index=0).summary())
 # print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights()))
 # print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights()))
 # print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights()))
@@ -65,40 +65,45 @@ print(model.act_model.get_layer(index=0).summary())
 
 
 
-# window_size = (0,0,1920,1017)
-# station_size = (230, 230, 1670, 930)
-# WIDTH = 768
-# HEIGHT = 407
+window_size = (0,0,1920,1017)
+station_size = (230, 230, 1670, 930)
+WIDTH = 768
+HEIGHT = 407
 
-# hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
-# boss_blood = boss_hp(hp_station, 570)
-# last_hp = boss_blood
-# next_self_blood  = player_hp(hp_station)
+hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
+boss_blood = boss_hp(hp_station, 570)
+last_hp = boss_blood
+next_self_blood  = player_hp(hp_station)
 
-# min_hp = 9
+min_hp = 9
 
-# check_point = (612, 187)
-# while True:
-#     hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
-#     # print(hp_station[401][97], " ", hp_station[401][98]," ", hp_station[401][99])
-#     # station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-#     print(hp_station[187][300])
-#     # next_boss_blood = boss_hp(hp_station, last_hp)
-#     # print(next_boss_blood)
-#     # print(boss_blood)
-#     # last_hp = boss_blood
-#     # boss_blood = next_boss_blood
-#     # print(hp_station[95][40])
-#     # if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
-#     #     # print("Not in game yet")
-#     #     continue
-#     # next_self_blood = player_hp(hp_station)
-#     # if next_self_blood - min_hp < 0 and next_self_blood - min_hp > -3:
-#     #     print(next_self_blood)
-#     #     min_hp = next_self_blood
-#     # if next_self_blood ==9 and min_hp != 9:
-#     #     print("----------------------------------------")
-#     #     min_hp = 9
+check_point = (612, 187)
+start_time = time.time()
+for i in range(10):
+    hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
+    fn = "./test_img/" + str(i) + ".png"
+    cv2.imwrite(fn, hp_station)
+    time.sleep(0.02)
+print(time.time() - start_time)
+    # print(hp_station[401][97], " ", hp_station[401][98]," ", hp_station[401][99])
+    # station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
+    # print(hp_station[187][300])
+    # next_boss_blood = boss_hp(hp_station, last_hp)
+    # print(next_boss_blood)
+    # print(boss_blood)
+    # last_hp = boss_blood
+    # boss_blood = next_boss_blood
+    # print(hp_station[95][40])
+    # if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
+    #     # print("Not in game yet")
+    #     continue
+    # next_self_blood = player_hp(hp_station)
+    # if next_self_blood - min_hp < 0 and next_self_blood - min_hp > -3:
+    #     print(next_self_blood)
+    #     min_hp = next_self_blood
+    # if next_self_blood ==9 and min_hp != 9:
+    #     print("----------------------------------------")
+    #     min_hp = 9
 #     cv2.circle(hp_station, (300, 187), 5, (255, 0, 0), 4, 1)
 #     # cv2.line(hp_station,(96, 400), (666, 400), (255, 255, 255), 4, 1)
 #     # print(station[187][612])
