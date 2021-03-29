@@ -14,13 +14,12 @@ from Model import Model
 
 
 
-# ACTION_DIM = 9
-# INPUT_SHAPE = (200, 400, 3)
-# ACTION_SEQ = 3
+ACTION_DIM = 9
+INPUT_SHAPE = (200, 400, 3)
 
-# model = Model(INPUT_SHAPE, ACTION_DIM, ACTION_SEQ)
+model = Model(INPUT_SHAPE, ACTION_DIM)
 
-# print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights()))
+print(model.act_model.get_layer(index=0).summary())
 # print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights()))
 # print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights()))
 # print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights()))

@@ -5,8 +5,7 @@ import pickle
 import os
 
 class ReplayMemory:
-    def __init__(self,max_size,file_name,user=False):
-        self.user = user
+    def __init__(self,max_size,file_name):
         self.size = max_size
         self.count = 0
         self.file_name = file_name

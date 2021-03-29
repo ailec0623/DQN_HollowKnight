@@ -85,79 +85,77 @@ class Model:
 
     # use two groups of net, one for action, one for move
     def _build_model(self):
-       # action net
+
        # ------------------ build evaluate_net ------------------
-        act_model = models.Sequential()
 
+       # shared part
+        shared_model = models.Sequential()
         # pre-process block
-        act_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
-        act_model.add(BatchNormalization(name='b1'))
-        act_model.add(Activation('relu'))
-        act_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
-
+        shared_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
+        shared_model.add(BatchNormalization(name='b1'))
+        shared_model.add(Activation('relu'))
+        shared_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
         # resnet blocks
-        act_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        act_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        act_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        act_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
+        shared_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        shared_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
+        shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        shared_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
 
+        self.shared_model = shared_model
+        # action model
+        act_model = models.Sequential()
+        # add shared block
+        act_model.add(shared_model)
         # fully connected block
         act_model.add(GlobalAveragePooling2D())
         act_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         act_model.summary()
-
         self.act_model = act_model
 
+        # move model
+        move_model = models.Sequential()
+        # add shared block
+        move_model.add(shared_model)
+        # fully connected block
+        move_model.add(GlobalAveragePooling2D())
+        move_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+        move_model.summary()
+        self.move_model = move_model
+
+
+
+
         # ------------------ build target_model ------------------
+        shared_target_model = models.Sequential()
+        # pre-process block
+        shared_target_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
+        shared_target_model.add(BatchNormalization(name='b1'))
+        shared_target_model.add(Activation('relu'))
+        shared_target_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
+        # resnet blocks
+        shared_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        shared_target_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
+        shared_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        shared_target_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
+        self.shared_target_model = shared_target_model
+
+        # action model
         act_target_model = models.Sequential()
-        act_target_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
-        act_target_model.add(BatchNormalization(name='b1'))
-        act_target_model.add(Activation('relu'))
-        act_target_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
-
-        act_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        act_target_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        act_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        act_target_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
-
+        # add shared block
+        act_target_model.add(shared_target_model)
+        # fully connected block
         act_target_model.add(GlobalAveragePooling2D())
         act_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         act_target_model.summary()
         self.act_target_model = act_target_model
 
-       # move net
-       # ------------------ build move_evaluate_net ------------------
-        move_model = models.Sequential()
-
-        # pre-process block
-        move_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
-        move_model.add(BatchNormalization(name='b1'))
-        move_model.add(Activation('relu'))
-        move_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
-
-        move_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        move_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        move_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        move_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
-
-        move_model.add(GlobalAveragePooling2D())
-        move_model.add(Dense(4, name='d1', kernel_regularizer=regularizers.L2(0.001)))
-        move_model.summary()
-
-        self.move_model = move_model
-       # ------------------ build move_target_model ------------------
+        # move model
         move_target_model = models.Sequential()
-        move_target_model.add(Conv2D(64, 3,strides=(1,1), input_shape=self.input_shape, name='conv1'))
-        move_target_model.add(BatchNormalization(name='b1'))
-        move_target_model.add(Activation('relu'))
-        move_target_model.add(MaxPooling2D(pool_size=2, strides=1, padding="VALID", name='p1'))
-
-        move_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        move_target_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        move_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        move_target_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
-
+        # add shared block
+        move_target_model.add(shared_target_model)
+        # fully connected block
         move_target_model.add(GlobalAveragePooling2D())
-        move_target_model.add(Dense(4, name='d1', kernel_regularizer=regularizers.L2(0.001)))
+        move_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         move_target_model.summary()
+
         self.move_target_model = move_target_model

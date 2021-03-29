@@ -192,8 +192,8 @@ if __name__ == '__main__':
 
     PASS_COUNT = 0                                       # pass count
 
-    act_rmp = ReplayMemory(MEMORY_SIZE, file_name='./act_memory', user = USER)         # experience pool
-    move_rmp = ReplayMemory(MEMORY_SIZE,file_name='./move_memory', user = USER)         # experience pool
+    act_rmp = ReplayMemory(MEMORY_SIZE, file_name='./act_memory')         # experience pool
+    move_rmp = ReplayMemory(MEMORY_SIZE,file_name='./move_memory')         # experience pool
     
     # new model, if exit save file, load it
     model = Model(INPUT_SHAPE, ACTION_DIM)  
