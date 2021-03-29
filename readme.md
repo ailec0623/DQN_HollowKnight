@@ -45,4 +45,6 @@
 
 - Use two models to output actions. One is for moving and the orther is for attack/jump/skill
 
+- Apply RESNET
+
 - ...
