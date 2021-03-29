@@ -45,7 +45,6 @@ action_name = ["Attack", "Attack_Down", "Attack_Up",
 
 move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
-USER = False
 DELEY_REWARD = 3
 
 
@@ -218,17 +217,13 @@ if __name__ == '__main__':
     while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
         # 训练
         episode += 1     
-        if USER: # train by human, no need anymore
-            total_reward, total_step = user_run(algorithm,user,act_rmp, PASS_COUNT, paused)            
+        if episode % 10 == 1:
+            algorithm.replace_target()
+
+        total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)
+
+        if episode % 10 == 1:
             model.save_mode()
-        else:
-            if episode % 10 == 1:
-                algorithm.replace_target()
-
-            total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)
-
-            if episode % 10 == 1:
-                model.save_mode()
                 
         print("Episode: ", episode, ", mean(reward):", total_reward/total_step,", pass_count: " , PASS_COUNT)
 
