@@ -8,7 +8,9 @@
 /move_memory/
 /__pycache__/
 ./__pycache__
+/test_img/
 /OLD_FILE/
+*.png
 *.jpg
 *.h5
 *.pyc
