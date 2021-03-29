@@ -31,7 +31,6 @@ WIDTH = 400
 HEIGHT = 200
 ACTION_DIM = 9
 INPUT_SHAPE = (HEIGHT, WIDTH, 3)
-ACTION_SEQ = 3
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
@@ -47,7 +46,7 @@ action_name = ["Attack", "Attack_Down", "Attack_Up",
 move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
 USER = False
-DELEY_REWARD = 2
+DELEY_REWARD = 3
 
 
 
@@ -69,22 +68,13 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
 
-    act_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-    act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+    station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
+    hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
-    act_boss_hp = boss_hp(act_hp_station, 570)
-    act_boss_last_hp = act_boss_hp
-    act_self_hp = player_hp(act_hp_station)
+    boss_hp_value = boss_hp(hp_station, 570)
+    boss_last_hp = boss_hp_value
+    self_hp = player_hp(hp_station)
     min_hp = 9
-
-
-    move_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-    move_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
-
-    move_boss_hp = boss_hp(move_hp_station, 570)
-    move_boss_last_hp = move_boss_hp
-    move_self_hp = player_hp(move_hp_station)
-
 
 
     step = 0
@@ -92,116 +82,75 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     total_reward = 0
 
 
-
-    start_time = time.time()
+    # start_time = time.time()
     # Deley Reward
     DeleyReward = collections.deque(maxlen=DELEY_REWARD)
     DeleyStation = collections.deque(maxlen=DELEY_REWARD)
     DeleyActions = collections.deque(maxlen=DELEY_REWARD)
+    DeleyDirection = collections.deque(maxlen=DELEY_REWARD)
 
     # move direction of player 0 for stay, 1 for left, 2 for right
-    direction = 0
     while True:
         
         # player hp bar is not in normal state and the left pixels are not black
-        if(act_hp_station[40][95] != 56 and act_hp_station[300][30] > 20 and act_hp_station[200][30] > 20):
+        if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
             # print("Not in game yet 1")
-            act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+            hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
             continue
         
         # there is not boss hp bar
-        if act_hp_station[401][98] != 0 and act_hp_station[401][98] == 0:
+        if hp_station[401][98] != 0 and hp_station[401][98] == 0:
             # print("Not in game yet 2")
-            act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+            hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
             continue
 
-        last_time = time.time()
+        # last_time = time.time()
         # no more than 10 mins
         # if time.time() - start_time > 600:
         #     break
 
         
 
-        
-        actions = agent.act_sample(act_station)
+        d = agent.move_sample(station)
+        action = agent.act_sample(station)
+        step += 1
 
-        # execute action in action seq
-        for action in actions:
-            step += 1
-            d = agent.move_sample(move_station)
-            # print("Move:", move_name[d] )
+        # print("Move:", move_name[d] )
+        take_direction(d)
+        take_action(action)
 
-            take_direction(d)
 
-            take_action(action)
+        next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
+        next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
-            
+        next_boss_hp_value = boss_hp(next_hp_station, boss_last_hp)
+        boss_last_hp = boss_hp_value
+        next_self_hp = player_hp(next_hp_station)
 
-            next_move_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-            next_move_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+        if min_hp == 9 and next_self_hp == 1:
+            next_self_hp = 9
 
-            next_move_boss_hp = boss_hp(next_move_hp_station, move_boss_last_hp)
-            move_boss_last_hp = move_boss_hp
-            next_move_self_hp = player_hp(next_move_hp_station)
-
-            if min_hp == 9 and next_move_self_hp == 1:
-                next_move_self_hp = 9
-
-            reward, done, min_hp = Tool.Helper.action_judge(move_boss_hp, next_move_boss_hp,move_self_hp, next_move_self_hp, min_hp)
+        reward, done, min_hp = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, min_hp)
             # print(reward)
-            print( action_name[action], ", ", move_name[d], ", ", reward)
-            move_rmp.append((move_station, d, reward, next_move_station,done))
+        print( action_name[action], ", ", move_name[d], ", ", reward)
 
-            # if (len(move_rmp) > MEMORY_WARMUP_SIZE and step % LEARN_FREQ == 0):
-            #     print("move learning")
-            #     batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
-            #     algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
-
-
-            if done == 1:
-                Tool.Actions.Nothing()
-                break
-            elif done == 2:
-                Tool.Actions.Nothing()
-                break
-
-            move_station = next_move_station
-            move_self_hp = next_move_self_hp
-            move_boss_hp = next_move_boss_hp
-            direction = d
-
-            
-        if done == 1:
-            Tool.Actions.Nothing()
-            break
-        elif done == 2:
-            Tool.Actions.Nothing()
-            break
-
-
-        next_act_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-        next_act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
-
-        next_act_boss_hp = boss_hp(next_act_hp_station, act_boss_last_hp)
-
-        act_boss_last_hp = act_boss_hp
-
-        next_act_self_hp = player_hp(next_act_hp_station)
-
-        if min_hp == 9 and next_move_self_hp == 1:
-            next_move_self_hp = 9
-
-
-        reward, done, min_hp = Tool.Helper.action_judge(act_boss_hp, next_act_boss_hp,act_self_hp, next_act_self_hp, min_hp)
         DeleyReward.append(reward)
-        DeleyStation.append(act_station)
-        DeleyActions.append(actions)
-        reward = mean(DeleyReward)
-        # print("reward: ",reward,"self_hp: ",next_act_self_hp,"boss_hp: ",next_act_boss_hp)
+        DeleyStation.append(station)
+        DeleyActions.append(action)
+        DeleyDirection.append(d)
+
+        print(mean(DeleyReward))
+
 
         if len(DeleyReward) >= DELEY_REWARD:
-            act_rmp.append((DeleyStation[0],DeleyActions[0],reward,DeleyStation[1],done))
-        
+            move_rmp.append((DeleyStation[0],DeleyDirection[0],mean(DeleyReward),DeleyStation[1],done))
+            act_rmp.append((DeleyStation[0],DeleyActions[0],mean(DeleyReward),DeleyStation[1],done))
+
+        station = next_station
+        self_hp = next_self_hp
+        boss_hp_value = next_boss_hp_value
+            
+
         # if (len(act_rmp) > MEMORY_WARMUP_SIZE and int(step/ACTION_SEQ) % LEARN_FREQ == 0):
         #     print("action learning")
         #     batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
@@ -218,9 +167,6 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
             Tool.Actions.Nothing()
             break
 
-        act_station = next_act_station
-        act_self_hp = next_act_self_hp
-        act_boss_hp = next_act_boss_hp
 
 
     for i in range(2):
@@ -247,16 +193,16 @@ if __name__ == '__main__':
 
     PASS_COUNT = 0                                       # pass count
 
-    act_rpm = ReplayMemory(MEMORY_SIZE, file_name='./act_memory', user = USER)         # experience pool
-    move_rpm = ReplayMemory(MEMORY_SIZE,file_name='./move_memory', user = USER)         # experience pool
+    act_rmp = ReplayMemory(MEMORY_SIZE, file_name='./act_memory', user = USER)         # experience pool
+    move_rmp = ReplayMemory(MEMORY_SIZE,file_name='./move_memory', user = USER)         # experience pool
     
     # new model, if exit save file, load it
-    model = Model(INPUT_SHAPE, ACTION_DIM, ACTION_SEQ)  
+    model = Model(INPUT_SHAPE, ACTION_DIM)  
     if os.path.exists('./model/act_model.h5'):
         print("model exists , load model\n")
         model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,ACTION_SEQ,algorithm,e_greed=0.5,e_greed_decrement=2e-5)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.5,e_greed_decrement=1e-5)
     
     # get user input, no need anymore
     # user = User()
@@ -267,19 +213,20 @@ if __name__ == '__main__':
 
 
     max_episode = 30000
-    algorithm.replace_target()
     # 开始训练
     episode = 0
     while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
         # 训练
         episode += 1     
         if USER: # train by human, no need anymore
-            total_reward, total_step = user_run(algorithm,user,act_rpm, PASS_COUNT, paused)            
+            total_reward, total_step = user_run(algorithm,user,act_rmp, PASS_COUNT, paused)            
             model.save_mode()
         else:
-            total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rpm,move_rpm, PASS_COUNT, paused)
             if episode % 10 == 1:
                 algorithm.replace_target()
+
+            total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)
+
             if episode % 10 == 1:
                 model.save_mode()
                 

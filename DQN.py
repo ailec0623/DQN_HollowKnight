@@ -4,7 +4,6 @@ class DQN:
     def __init__(self,model,gamma=0.9,learnging_rate=0.000001):
         self.model = model
         self.act_dim = model.act_dim
-        self.act_seq = model.act_seq
         self.act_model = model.act_model
         self.act_target_model = model.act_target_model
         self.move_model = model.move_model
@@ -48,7 +47,7 @@ class DQN:
         for epoch in tf.range(1,epochs+1):
             self.act_train_step(action,features,labels)
 
-    def act_learn(self,obs,actions,reward,next_obs,terminal):
+    def act_learn(self,obs,action,reward,next_obs,terminal):
         """ 使用DQN算法更新self.act_model的value网络
         """
         # print('learning')
@@ -57,21 +56,12 @@ class DQN:
         #     self.act_replace_target()
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
-        next_pred_value = self.act_target_model.predict(next_obs)
-        # print(next_pred_value.shape)
-        next_pred_value = next_pred_value.reshape((len(reward), self.act_seq, self.act_dim))
-        
-        best_v = tf.transpose(tf.reduce_max(next_pred_value,axis=2))
-        actions = [[row[i] for row in actions] for i in range(len(actions[0]))]
-        for i, acts in enumerate(actions):
-            for a in acts:
-                a += i * self.act_dim
-        for i in range(self.act_seq):
-            terminal = tf.cast(terminal,dtype=tf.float32)
-            target = reward + self.gamma  * best_v[i]
-            # print('get q')
-            # 训练模型
-            self.act_train_model(actions[i],obs,target,epochs=1)
+        next_pred_value = self.act_target_model.predict(next_obs)        
+        best_v = tf.reduce_max(next_pred_value,axis=1)
+        terminal = tf.cast(terminal,dtype=tf.float32)
+        target = reward + self.gamma * best_v
+
+        self.act_train_model(action,obs,target,epochs=1)
         self.act_global_step += 1
         # print('finish')
     def act_replace_target(self):

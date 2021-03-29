@@ -52,9 +52,8 @@ class BasicBlock(layers.Layer):
 
 
 class Model:
-    def __init__(self, input_shape, act_dim, action_seq):
+    def __init__(self, input_shape, act_dim):
         self.act_dim = act_dim
-        self.act_seq = action_seq
         self.input_shape = input_shape
         self._build_model()
         self.act_loss = []
@@ -99,12 +98,12 @@ class Model:
         # resnet blocks
         act_model.add(self.build_resblock(64, 2, name='Resnet_1'))
         act_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        act_model.add(self.build_resblock(256, 2, name='Resnet_3', stride=2))
-        act_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
+        act_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        act_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
 
         # fully connected block
         act_model.add(GlobalAveragePooling2D())
-        act_model.add(Dense(self.act_dim*self.act_seq, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+        act_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         act_model.summary()
 
         self.act_model = act_model
@@ -118,11 +117,11 @@ class Model:
 
         act_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
         act_target_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        act_target_model.add(self.build_resblock(256, 2, name='Resnet_3', stride=2))
-        act_target_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
+        act_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        act_target_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
 
         act_target_model.add(GlobalAveragePooling2D())
-        act_target_model.add(Dense(self.act_dim*self.act_seq, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+        act_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         act_target_model.summary()
         self.act_target_model = act_target_model
 
@@ -138,8 +137,8 @@ class Model:
 
         move_model.add(self.build_resblock(64, 2, name='Resnet_1'))
         move_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        move_model.add(self.build_resblock(256, 2, name='Resnet_3', stride=2))
-        move_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
+        move_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        move_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
 
         move_model.add(GlobalAveragePooling2D())
         move_model.add(Dense(4, name='d1', kernel_regularizer=regularizers.L2(0.001)))
@@ -155,8 +154,8 @@ class Model:
 
         move_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
         move_target_model.add(self.build_resblock(128, 2, name='Resnet_2', stride=2))
-        move_target_model.add(self.build_resblock(256, 2, name='Resnet_3', stride=2))
-        move_target_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
+        move_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        move_target_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
 
         move_target_model.add(GlobalAveragePooling2D())
         move_target_model.add(Dense(4, name='d1', kernel_regularizer=regularizers.L2(0.001)))
