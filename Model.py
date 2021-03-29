@@ -104,7 +104,7 @@ class Model:
 
         # fully connected block
         act_model.add(GlobalAveragePooling2D())
-        act_model.add(Dense(self.act_dim*self.act_seq, name="d1"))
+        act_model.add(Dense(self.act_dim*self.act_seq, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         act_model.summary()
 
         self.act_model = act_model
@@ -122,7 +122,7 @@ class Model:
         act_target_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
 
         act_target_model.add(GlobalAveragePooling2D())
-        act_target_model.add(Dense(self.act_dim*self.act_seq, name="d1"))
+        act_target_model.add(Dense(self.act_dim*self.act_seq, name="d1", kernel_regularizer=regularizers.L2(0.001)))
         act_target_model.summary()
         self.act_target_model = act_target_model
 
@@ -142,7 +142,7 @@ class Model:
         move_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
 
         move_model.add(GlobalAveragePooling2D())
-        move_model.add(Dense(3, name='d1'))
+        move_model.add(Dense(4, name='d1', kernel_regularizer=regularizers.L2(0.001)))
         move_model.summary()
 
         self.move_model = move_model
@@ -159,6 +159,6 @@ class Model:
         move_target_model.add(self.build_resblock(512, 2, name='Resnet_4', stride=2))
 
         move_target_model.add(GlobalAveragePooling2D())
-        move_target_model.add(Dense(3, name='d1'))
+        move_target_model.add(Dense(4, name='d1', kernel_regularizer=regularizers.L2(0.001)))
         move_target_model.summary()
         self.move_target_model = move_target_model

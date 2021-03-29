@@ -1,7 +1,7 @@
 import tensorflow as tf
-
+import numpy as np
 class DQN:
-    def __init__(self,model,gamma=0.9,learnging_rate=0.01):
+    def __init__(self,model,gamma=0.9,learnging_rate=0.000001):
         self.model = model
         self.act_dim = model.act_dim
         self.act_seq = model.act_seq
@@ -68,7 +68,7 @@ class DQN:
                 a += i * self.act_dim
         for i in range(self.act_seq):
             terminal = tf.cast(terminal,dtype=tf.float32)
-            target = reward + self.gamma * (1.0 - terminal) * best_v[i]
+            target = reward + self.gamma  * best_v[i]
             # print('get q')
             # 训练模型
             self.act_train_model(actions[i],obs,target,epochs=1)
@@ -104,7 +104,12 @@ class DQN:
 
 
     # train functions for move_model
-
+    def move_plot_loss(self):
+        import matplotlib.pyplot as plt
+        plt.plot(np.array(range(len(self.model.move_loss)), self.model.move_loss))
+        plt.ylabel("Loss")
+        plt.xlabel('training steps')
+        plt.show()
     def move_predict(self, obs):
         """ 使用self.move_model的value网络来获取 [Q(s,a1),Q(s,a2),...]
         """
@@ -122,6 +127,8 @@ class DQN:
         gradients = tape.gradient(loss,self.move_model.trainable_variables)
         self.move_model.optimizer.apply_gradients(zip(gradients,self.move_model.trainable_variables))
         self.model.move_loss.append(loss)
+        # self.move_plot_loss()
+        print("Move loss: ", loss)
         # self.move_model.train_loss.update_state(loss)
     def move_train_model(self,action,features,labels,epochs=1):
         """ 训练模型
@@ -142,7 +149,7 @@ class DQN:
         next_pred_value = self.move_target_model.predict(next_obs)        
         best_v = tf.reduce_max(next_pred_value,axis=1)
         terminal = tf.cast(terminal,dtype=tf.float32)
-        target = reward + self.gamma * (1.0 - terminal) * best_v
+        target = reward + self.gamma * best_v
 
         self.move_train_model(action,obs,target,epochs=1)
         self.move_global_step += 1
@@ -178,6 +185,6 @@ class DQN:
 
 
     def replace_target(self):
-        print("replace target")
+        # print("replace target")
         self.move_replace_target()
         self.act_replace_target()

@@ -26,18 +26,34 @@ def Nothing():
     pass
 
 # Move
-# 1
+# 0
 def Move_Left():
     ReleaseKey(RIGHT_ARROW)
     time.sleep(0.03)
     PressKey(LEFT_ARROW)
     time.sleep(0.05)
-# 2
+# 1
 def Move_Right():
     ReleaseKey(LEFT_ARROW)
     time.sleep(0.03)
     PressKey(RIGHT_ARROW)
     time.sleep(0.05)
+
+# 2
+def Turn_Left():
+    ReleaseKey(RIGHT_ARROW)
+    time.sleep(0.03)
+    PressKey(LEFT_ARROW)
+    time.sleep(0.05)
+    ReleaseKey(LEFT_ARROW)
+
+# 3
+def Turn_Right():
+    ReleaseKey(LEFT_ARROW)
+    time.sleep(0.03)
+    PressKey(RIGHT_ARROW)
+    time.sleep(0.05)
+    ReleaseKey(RIGHT_ARROW)
 
 # ----------------------------------------------------------------------
 
@@ -48,38 +64,38 @@ def Attack():
     PressKey(X)
     time.sleep(0.08)
     ReleaseKey(X)
-    time.sleep(0.2)
+    time.sleep(0.07)
 # 1
 def Attack_Down():
     PressKey(DOWN_ARROW)
     PressKey(X)
-    time.sleep(0.07)
+    time.sleep(0.08)
     ReleaseKey(X)
     ReleaseKey(DOWN_ARROW)
-    time.sleep(0.2)
+    time.sleep(0.07)
 # 2
 def Attack_Up():
     # print("Attack up--->")
     PressKey(UP_ARROW)
     PressKey(X)
-    time.sleep(0.07)
+    time.sleep(0.08)
     ReleaseKey(X)
     ReleaseKey(UP_ARROW)
-    time.sleep(0.2)
+    time.sleep(0.07)
 
 #JUMP
 # 3
 def Short_Jump():
     PressKey(C)
-    time.sleep(0.1)
+    time.sleep(0.2)
     ReleaseKey(C)
-    time.sleep(0.05)
+
 # 4
 def Mid_Jump():
     PressKey(C)
-    time.sleep(0.5)
+    time.sleep(0.4)
     ReleaseKey(C)
-    time.sleep(0.05)
+
 
 # Skill
 # 5
@@ -176,7 +192,10 @@ def restart():
 Actions = [Attack, Attack_Down, Attack_Up,
            Short_Jump, Mid_Jump, Skill, Skill_Up, 
            Skill_Down, Rush, Cure]
-
+Directions = [Move_Left, Move_Right, Turn_Left, Turn_Right]
 # Run the action
 def take_action(action):
     Actions[action]()
+
+def take_direction(direc):
+    Directions[direc]()

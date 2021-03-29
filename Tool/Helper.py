@@ -21,7 +21,7 @@ def mean(d):
 def count_self_reward(next_self_blood, min_hp):
     if next_self_blood - min_hp < 0:
         # print("test case 1")
-        self_blood_reward = 45 * (next_self_blood - min_hp)
+        self_blood_reward = 70 * (next_self_blood - min_hp)
         min_hp = next_self_blood
         return self_blood_reward, min_hp
     return 0, min_hp
@@ -39,7 +39,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
     # Player dead
     if next_self_blood == 9 and min_hp <= 3:    
         print("Player dead.", next_self_blood,", ", min_hp)
-        reward = -35
+        reward = -70
         done = 1
         min_hp = 9
         
@@ -47,7 +47,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
     #boss dead
     elif next_boss_blood - boss_blood > 200:   
 
-        reward = 30
+        reward = 20
         done = 2
         min_hp = 9
         print("Boss dead.")
@@ -129,6 +129,8 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
         #     # self_blood_reward += 1
 
         reward = self_blood_reward + boss_blood_reward
+
+        # reward = 0.1 * (reward + 140)
 
         done = 0
         emergence_break = 0

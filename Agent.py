@@ -38,7 +38,7 @@ class Agent:
     def move_sample(self, obs):
         sample = np.random.rand()  # 产生0~1之间的小数
         if sample < self.e_greed:
-            act = np.random.randint(3)  # 探索：每个动作都有概率被选择
+            act = np.random.randint(4)  # 探索：每个动作都有概率被选择
         else:
             act = self.move_predict(obs)  # 选择最优动作
         self.e_greed = max(
@@ -48,4 +48,5 @@ class Agent:
     def move_predict(self,obs):
         obs = tf.expand_dims(obs,axis=0)
         action = self.algorithm.move_model.predict(obs)
+        print(action)
         return np.argmax(action)

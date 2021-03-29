@@ -17,7 +17,7 @@ from ReplayMemory import ReplayMemory
 import Tool.Helper
 import Tool.Actions
 from Tool.Helper import mean, is_end
-from Tool.Actions import take_action, restart
+from Tool.Actions import take_action, restart,take_direction
 from Tool.WindowsAPI import grab_screen
 from Tool.GetHP import boss_hp, player_hp
 from Tool.UserInput import User
@@ -36,7 +36,7 @@ ACTION_SEQ = 3
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
 MEMORY_WARMUP_SIZE = 20  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 10  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+BATCH_SIZE = 8  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
@@ -44,7 +44,7 @@ action_name = ["Attack", "Attack_Down", "Attack_Up",
            "Short_Jump", "Mid_Jump", "Skill", "Skill_Up", 
            "Skill_Down", "Rush", "Cure"]
 
-move_name = ["Nothing", "Move_Left", "Move_Right"]
+move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
 USER = False
 DELEY_REWARD = 2
@@ -55,6 +55,20 @@ DELEY_REWARD = 2
 def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     restart()
     
+    for i in range(1):
+        if (len(move_rmp) > MEMORY_WARMUP_SIZE):
+            print("move learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
+            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
+
+        if (len(act_rmp) > MEMORY_WARMUP_SIZE):
+            print("action learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
+            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
+
+
+
+
     act_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
     act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
@@ -91,12 +105,14 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         
         # player hp bar is not in normal state and the left pixels are not black
         if(act_hp_station[40][95] != 56 and act_hp_station[300][30] > 20 and act_hp_station[200][30] > 20):
-            print("Not in game yet 1")
+            # print("Not in game yet 1")
+            act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
             continue
         
         # there is not boss hp bar
         if act_hp_station[401][98] != 0 and act_hp_station[401][98] == 0:
-            print("Not in game yet 2")
+            # print("Not in game yet 2")
+            act_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
             continue
 
         last_time = time.time()
@@ -115,18 +131,11 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
             d = agent.move_sample(move_station)
             # print("Move:", move_name[d] )
 
-            if d == direction:
-                pass
-            elif d == 0:
-                Tool.Actions.Nothing()
-            elif d == 1:
-                Tool.Actions.Move_Left()
-            elif d == 2:
-                Tool.Actions.Move_Right()
+            take_direction(d)
 
             take_action(action)
 
-            # print("Action: ", action_name[action])
+            
 
             next_move_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
             next_move_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
@@ -140,7 +149,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
             reward, done, min_hp = Tool.Helper.action_judge(move_boss_hp, next_move_boss_hp,move_self_hp, next_move_self_hp, min_hp)
             # print(reward)
-
+            print( action_name[action], ", ", move_name[d], ", ", reward)
             move_rmp.append((move_station, d, reward, next_move_station,done))
 
             # if (len(move_rmp) > MEMORY_WARMUP_SIZE and step % LEARN_FREQ == 0):
@@ -213,15 +222,17 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         act_self_hp = next_act_self_hp
         act_boss_hp = next_act_boss_hp
 
-    if (len(move_rmp) > MEMORY_WARMUP_SIZE):
-        print("move learning")
-        batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
-        algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
 
-    if (len(act_rmp) > MEMORY_WARMUP_SIZE):
-        print("action learning")
-        batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
-        algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
+    for i in range(2):
+        if (len(move_rmp) > MEMORY_WARMUP_SIZE):
+            print("move learning")
+            batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
+            algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
+
+        if (len(act_rmp) > MEMORY_WARMUP_SIZE):
+            print("action learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
+            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
     return total_reward, step, PASS_COUNT
 
@@ -256,7 +267,7 @@ if __name__ == '__main__':
 
 
     max_episode = 30000
-
+    algorithm.replace_target()
     # 开始训练
     episode = 0
     while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
@@ -267,7 +278,8 @@ if __name__ == '__main__':
             model.save_mode()
         else:
             total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rpm,move_rpm, PASS_COUNT, paused)
-            algorithm.replace_target()
+            if episode % 10 == 1:
+                algorithm.replace_target()
             if episode % 10 == 1:
                 model.save_mode()
                 

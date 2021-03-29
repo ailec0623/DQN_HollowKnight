@@ -5,7 +5,7 @@ import time
 from Tool.GetHP import boss_hp, player_hp
 from Tool.UserInput import User
 from Tool.WindowsAPI import grab_screen
-from Tool.Actions import take_action, restart
+from Tool.Actions import take_action, restart, take_direction
 from Tool.Helper import pause_game
 import os
 
@@ -14,45 +14,51 @@ from Model import Model
 
 
 
-ACTION_DIM = 9
-INPUT_SHAPE = (200, 400, 3)
-ACTION_SEQ = 3
+# ACTION_DIM = 9
+# INPUT_SHAPE = (200, 400, 3)
+# ACTION_SEQ = 3
 
-model = Model(INPUT_SHAPE, ACTION_DIM, ACTION_SEQ)
+# model = Model(INPUT_SHAPE, ACTION_DIM, ACTION_SEQ)
 
-print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights()))
-print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights()))
 
-print(len(model.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).get_weights()))
-print(len(model.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).get_weights()))
 
-print(len(model.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).get_weights()))
-print(len(model.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).get_weights()))
 
-print(len(model.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).get_weights()))
-print(len(model.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).get_weights()))
 
-print(len(model.act_model.get_layer(index=8).get_layer(index=0).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=8).get_layer(index=0).get_layer(index=1).get_weights()))
-print(len(model.act_model.get_layer(index=8).get_layer(index=1).get_layer(index=0).get_weights()))
-print(len(model.act_model.get_layer(index=8).get_layer(index=1).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=8).get_layer(index=0).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=8).get_layer(index=0).get_layer(index=1).get_weights()))
+# print(len(model.act_model.get_layer(index=8).get_layer(index=1).get_layer(index=0).get_weights()))
+# print(len(model.act_model.get_layer(index=8).get_layer(index=1).get_layer(index=1).get_weights()))
+
+
+
 # action = 11
-# # actions = [13,13, 3,3, 7,6, 12,6, 10, 4,4]
-# actions = [action, action, action, action, action]
+# directions = [0,1,0,1,3]
+# actions = [4,4,4,4,4]
+# # actions = [action, action, action, action, action]
 # while True:
 #     paused = True
 #     paused = pause_game(paused)
-#     for a in actions:
+#     for i in range(5):
 #         print(1)
-#         take_action(a)
+#         take_direction(directions[i])
+#         take_action(actions[i])
+        
 
 # for x in os.listdir("./act_memory"):
 #     print(1)
