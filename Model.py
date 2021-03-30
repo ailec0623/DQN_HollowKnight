@@ -25,7 +25,7 @@ class BasicBlock(layers.Layer):
         else:
             self.downsample=lambda x:x
 
-    def get_lyaer(self, index):
+    def get_layer(self, index):
         return self.layers[index]
 
     def get_layers(self):

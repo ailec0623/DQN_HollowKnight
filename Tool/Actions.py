@@ -184,13 +184,15 @@ def restart():
             break
     time.sleep(1)
     Look_up()
-    time.sleep(2.5)
+    time.sleep(1.5)
     Look_up()
     time.sleep(1)
     while True:
         station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
         if station[187][612][0] > 200: 
-            Short_Jump()
+            PressKey(C)
+            time.sleep(0.1)
+            ReleaseKey(C)
             break
         else:
             Look_up()
