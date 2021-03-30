@@ -28,16 +28,16 @@ station_size = (230, 230, 1670, 930)
 
 HP_WIDTH = 768
 HP_HEIGHT = 407
-WIDTH = 200
-HEIGHT = 100
+WIDTH = 400
+HEIGHT = 200
 ACTION_DIM = 9
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 64  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 64  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+MEMORY_WARMUP_SIZE = 3  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+BATCH_SIZE = 3  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.0001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
@@ -55,7 +55,7 @@ DELEY_REWARD = 3
 def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     restart()
     
-    for i in range(1):
+    for i in range(3):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
@@ -94,6 +94,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     # move direction of player 0 for stay, 1 for left, 2 for right
     while True:
         
+
         # player hp bar is not in normal state and the left pixels are not black
         if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
             # print("Not in game yet 1")
@@ -114,18 +115,20 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
             print(len(thread1.buffer))
             time.sleep(0.1)
         stations = thread1.get_buffer()
-
-        d = agent.move_sample(stations)
-        action = agent.act_sample(stations)
+        stations = tf.convert_to_tensor(stations, name='input', dtype=tf.int32)
+        
+        start_time = time.time()
+        move, action = agent.sample(stations)
+        print(time.time() - start_time)
         step += 1
 
         # print("Move:", move_name[d] )
         # thread2 = TackAction(2, "ActionThread", d, action)
         # thread2.start()
-        take_direction(d)
+        take_direction(move)
         take_action(action)
 
-
+        
         next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
         next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
 
@@ -135,16 +138,14 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
         if min_hp == 9 and next_self_hp == 1:
             next_self_hp = 9
-
+        
         reward, done, min_hp = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, min_hp)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
-
         DeleyReward.append(reward)
         DeleyStation.append(stations)
         DeleyActions.append(action)
-        DeleyDirection.append(d)
-
+        DeleyDirection.append(move)
         # print(mean(DeleyReward))
 
 
@@ -175,7 +176,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
     thread1.stop()
-    for i in range(2):
+    for i in range(4):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
@@ -204,11 +205,11 @@ if __name__ == '__main__':
     
     # new model, if exit save file, load it
     model = Model(INPUT_SHAPE, ACTION_DIM)  
-    if os.path.exists('./model/act_model.h5'):
+    if os.path.exists("./model/shared_model.h5"):
         print("model exists , load model\n")
         model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.05,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.6,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()

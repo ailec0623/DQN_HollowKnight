@@ -10,6 +10,27 @@ class Agent:
         self.e_greed_decrement = e_greed_decrement
 
 
+    def sample(self, station):
+        pred_move, pred_act = self.algorithm.model.predict(station)
+
+        sample = np.random.rand()  
+        if sample < self.e_greed:
+            move = np.random.randint(4)  # 探索：每个动作都有概率被选择
+        else:
+            move = np.argmax(pred_move)
+        self.e_greed = max(
+            0.05, self.e_greed - self.e_greed_decrement)  
+
+        sample = np.random.rand() 
+        if sample < self.e_greed:
+            act = np.random.randint(self.act_dim)  
+        else:
+            act = np.argmax(pred_act)
+        self.e_greed = max(
+            0.05, self.e_greed - self.e_greed_decrement)  
+        return move, act
+    
+
     def act_sample(self, station):
         # print("self.e_greed: ", self.e_greed)
         sample = np.random.rand() 
@@ -30,12 +51,12 @@ class Agent:
     def move_sample(self, obs):
         sample = np.random.rand()  
         if sample < self.e_greed:
-            act = np.random.randint(4)  # 探索：每个动作都有概率被选择
+            move = np.random.randint(4)  # 探索：每个动作都有概率被选择
         else:
-            act = self.move_predict(obs)  
+            move = self.move_predict(obs)  
         self.e_greed = max(
             0.05, self.e_greed - self.e_greed_decrement)  
-        return act
+        return move
     
     def move_predict(self,obs):
         obs = tf.expand_dims(obs,axis=0)

@@ -67,20 +67,20 @@ import os
 
 window_size = (0,0,1920,1017)
 station_size = (230, 230, 1670, 930)
-WIDTH = 768
-HEIGHT = 407
+WIDTH = 400
+HEIGHT = 200
 
 hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
-boss_blood = boss_hp(hp_station, 570)
-last_hp = boss_blood
-next_self_blood  = player_hp(hp_station)
+# boss_blood = boss_hp(hp_station, 570)
+# last_hp = boss_blood
+# next_self_blood  = player_hp(hp_station)
 
 min_hp = 9
 
 check_point = (612, 187)
 start_time = time.time()
 for i in range(10):
-    hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
+    hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_RGBA2RGB)
     fn = "./test_img/" + str(i) + ".png"
     cv2.imwrite(fn, hp_station)
     time.sleep(0.02)

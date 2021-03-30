@@ -67,7 +67,8 @@ class DQN:
     def act_replace_target(self):
         '''预测模型权重更新到target模型权重'''
     
-        self.act_target_model.get_layer(name='d1').set_weights(self.act_model.get_layer(name='d1').get_weights())
+        self.act_target_model.get_layer(index=1).get_layer(index=0).set_weights(self.act_model.get_layer(index=1).get_layer(index=0).get_weights())
+        self.act_target_model.get_layer(index=1).get_layer(index=1).set_weights(self.act_model.get_layer(index=1).get_layer(index=1).get_weights())
 
 
     # train functions for move_model
@@ -125,7 +126,8 @@ class DQN:
         '''预测模型权重更新到target模型权重'''
         
         
-        self.move_target_model.get_layer(name='d1').set_weights(self.move_model.get_layer(name='d1').get_weights())
+        self.move_target_model.get_layer(index=1).get_layer(index=0).set_weights(self.move_model.get_layer(index=1).get_layer(index=0).get_weights())
+        self.move_target_model.get_layer(index=1).get_layer(index=1).set_weights(self.move_model.get_layer(index=1).get_layer(index=1).get_weights())
 
 
 
