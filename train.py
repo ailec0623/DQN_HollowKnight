@@ -82,7 +82,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     total_reward = 0
 
 
-    # start_time = time.time()
+    start_time = time.time()
     # Deley Reward
     DeleyReward = collections.deque(maxlen=DELEY_REWARD)
     DeleyStation = collections.deque(maxlen=DELEY_REWARD)
@@ -94,7 +94,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     # move direction of player 0 for stay, 1 for left, 2 for right
     while True:
         
-
+        start_time = time.time()
         # player hp bar is not in normal state and the left pixels are not black
         if(hp_station[40][95] != 56 and hp_station[300][30] > 20 and hp_station[200][30] > 20):
             # print("Not in game yet 1")
@@ -112,22 +112,22 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         # if time.time() - start_time > 600:
         #     break
         while(len(thread1.buffer) < FRAMEBUFFERSIZE):
-            print(len(thread1.buffer))
             time.sleep(0.1)
-        stations = thread1.get_buffer()
-        stations = tf.convert_to_tensor(stations, name='input', dtype=tf.int32)
         
-        start_time = time.time()
+        stations = thread1.get_buffer()
+        
+                
+        
         move, action = agent.sample(stations)
-        print(time.time() - start_time)
         step += 1
 
         # print("Move:", move_name[d] )
         # thread2 = TackAction(2, "ActionThread", d, action)
         # thread2.start()
+
         take_direction(move)
         take_action(action)
-
+        
         
         next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
         next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
         # 训练
         episode += 1     
-        if episode % 10 == 1:
+        if episode % 15 == 1:
             algorithm.replace_target()
 
         total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)

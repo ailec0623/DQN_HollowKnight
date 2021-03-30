@@ -38,7 +38,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, min_h
     # get action reward
     # Player dead
     if next_self_blood == 9 and min_hp <= 3:    
-        print("Player dead.", next_self_blood,", ", min_hp)
+        print("Player dead.")
         reward = -70
         done = 1
         min_hp = 9
