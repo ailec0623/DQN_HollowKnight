@@ -132,28 +132,28 @@ class DQN:
     def replace_target(self):
         # print("replace target")
         self.model.shared_target_model.get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=0).get_weights())
+        self.model.shared_target_model.get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=1).get_weights())
         
-        self.model.shared_target_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=4).get_layer(index=0).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=4).get_layer(index=0).get_layer(index=1).get_weights())
-        self.model.shared_target_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=4).get_layer(index=1).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=4).get_layer(index=1).get_layer(index=1).get_weights())
-
-        self.model.shared_target_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=5).get_layer(index=0).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=5).get_layer(index=0).get_layer(index=1).get_weights())
-        self.model.shared_target_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=5).get_layer(index=1).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=5).get_layer(index=1).get_layer(index=1).get_weights())
-
-        self.model.shared_target_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=6).get_layer(index=0).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=6).get_layer(index=0).get_layer(index=1).get_weights())
-        self.model.shared_target_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=6).get_layer(index=1).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=6).get_layer(index=1).get_layer(index=1).get_weights())
-
-        self.model.shared_target_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=7).get_layer(index=0).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=7).get_layer(index=0).get_layer(index=1).get_weights())
-        self.model.shared_target_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).set_weights(self.model.shared_model.get_layer(index=7).get_layer(index=1).get_layer(index=0).get_weights())
-        self.model.shared_target_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).set_weights(self.model.shared_model.get_layer(index=7).get_layer(index=1).get_layer(index=1).get_weights())
-
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=4).get_layer(index=0).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=4).get_layer(index=0).get_layer(index=i).get_weights())
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=4).get_layer(index=1).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=4).get_layer(index=1).get_layer(index=i).get_weights())
         
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=5).get_layer(index=0).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=5).get_layer(index=0).get_layer(index=i).get_weights())
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=5).get_layer(index=1).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=5).get_layer(index=1).get_layer(index=i).get_weights())
+
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=6).get_layer(index=0).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=6).get_layer(index=0).get_layer(index=i).get_weights())
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=6).get_layer(index=1).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=6).get_layer(index=1).get_layer(index=i).get_weights())
+
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=7).get_layer(index=0).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=7).get_layer(index=0).get_layer(index=i).get_weights())
+        for i, l in enumerate(self.model.shared_target_model.get_layer(index=7).get_layer(index=1).get_layers()):
+            l.set_weights(self.model.shared_model.get_layer(index=7).get_layer(index=1).get_layer(index=i).get_weights())
+
 
         self.move_replace_target()
         self.act_replace_target()

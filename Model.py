@@ -16,14 +16,20 @@ class BasicBlock(layers.Layer):
         self.bn2 = layers.BatchNormalization()
         self.layers.append(self.conv1)
         self.layers.append(self.conv2)
+        self.layers.append(self.bn1)
+        self.layers.append(self.bn2)
         if stride!=1:
             self.downsample=models.Sequential()
             self.downsample.add(layers.Conv3D(filter_num,(1,1,1),strides=(1,stride,stride)))
+            self.layers.append(self.downsample)
         else:
             self.downsample=lambda x:x
 
-    def get_layer(self, index=0):
+    def get_lyaer(self, index):
         return self.layers[index]
+
+    def get_layers(self):
+        return self.layers
 
     def call(self,input,training=None):
         out=self.conv1(input)
