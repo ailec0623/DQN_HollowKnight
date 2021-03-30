@@ -33,20 +33,20 @@ def Move_Left():
     ReleaseKey(RIGHT_ARROW)
     time.sleep(0.03)
     PressKey(LEFT_ARROW)
-    time.sleep(0.05)
+    time.sleep(0.02)
 # 1
 def Move_Right():
     ReleaseKey(LEFT_ARROW)
     time.sleep(0.03)
     PressKey(RIGHT_ARROW)
-    time.sleep(0.05)
+    time.sleep(0.02)
 
 # 2
 def Turn_Left():
     ReleaseKey(RIGHT_ARROW)
     time.sleep(0.03)
     PressKey(LEFT_ARROW)
-    time.sleep(0.05)
+    time.sleep(0.01)
     ReleaseKey(LEFT_ARROW)
 
 # 3
@@ -54,7 +54,7 @@ def Turn_Right():
     ReleaseKey(LEFT_ARROW)
     time.sleep(0.03)
     PressKey(RIGHT_ARROW)
-    time.sleep(0.05)
+    time.sleep(0.01)
     ReleaseKey(RIGHT_ARROW)
 
 # ----------------------------------------------------------------------
@@ -64,38 +64,45 @@ def Turn_Right():
 # 0
 def Attack():
     PressKey(X)
-    time.sleep(0.08)
+    time.sleep(0.05)
     ReleaseKey(X)
-    time.sleep(0.07)
+    time.sleep(0.01)
 # 1
 def Attack_Down():
     PressKey(DOWN_ARROW)
     PressKey(X)
-    time.sleep(0.08)
+    time.sleep(0.05)
     ReleaseKey(X)
     ReleaseKey(DOWN_ARROW)
-    time.sleep(0.07)
+    time.sleep(0.01)
 # 2
 def Attack_Up():
     # print("Attack up--->")
     PressKey(UP_ARROW)
     PressKey(X)
-    time.sleep(0.08)
+    time.sleep(0.05)
     ReleaseKey(X)
     ReleaseKey(UP_ARROW)
-    time.sleep(0.07)
+    time.sleep(0.01)
 
 #JUMP
 # 3
 def Short_Jump():
     PressKey(C)
+    PressKey(DOWN_ARROW)
+    PressKey(X)
     time.sleep(0.2)
+    ReleaseKey(X)
+    ReleaseKey(DOWN_ARROW)
     ReleaseKey(C)
 
 # 4
 def Mid_Jump():
     PressKey(C)
-    time.sleep(0.4)
+    time.sleep(0.2)
+    PressKey(X)
+    time.sleep(0.2)
+    ReleaseKey(X)
     ReleaseKey(C)
 
 
