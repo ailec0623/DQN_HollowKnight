@@ -11,7 +11,9 @@ class Agent:
 
 
     def sample(self, station):
+        
         pred_move, pred_act = self.algorithm.model.predict(station)
+        print(pred_move)
 
         sample = np.random.rand()  
         if sample < self.e_greed:
@@ -61,5 +63,5 @@ class Agent:
     def move_predict(self,obs):
         obs = tf.expand_dims(obs,axis=0)
         direction = self.algorithm.move_model.predict(obs)
-        print(direction)
+        # print(direction)
         return np.argmax(direction)

@@ -21,11 +21,16 @@ class ReplayMemory:
 
 
     def sample(self,batch_size):
-        # mini_batch = random.sample(self.buffer, batch_size)
-        rd = random.randint(0, len(self.buffer) - batch_size)
-        mini_batch = []
-        for i in range(rd, rd + batch_size):
-            mini_batch.append(self.buffer[i])
+        # random batch
+        mini_batch = random.sample(self.buffer, batch_size)
+
+
+        # continually batches
+        # rd = random.randint(0, len(self.buffer) - batch_size)
+        # mini_batch = []
+        # for i in range(rd, rd + batch_size):
+        #     mini_batch.append(self.buffer[i])
+
         obs_batch, action_batch, reward_batch, next_obs_batch, done_batch = [], [], [], [], []
 
         for experience in mini_batch:

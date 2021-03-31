@@ -36,8 +36,8 @@ INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 3  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 3  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+MEMORY_WARMUP_SIZE = 12  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+BATCH_SIZE = 8  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.0001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
@@ -119,6 +119,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
                 
         
         move, action = agent.sample(stations)
+        
         step += 1
 
         # print("Move:", move_name[d] )
@@ -129,19 +130,28 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         take_action(action)
         
         
-        next_station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
-        next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
+        next_station = thread1.get_buffer()
 
+        next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
         next_boss_hp_value = boss_hp(next_hp_station, boss_last_hp)
         boss_last_hp = boss_hp_value
         next_self_hp = player_hp(next_hp_station)
 
+        # check again in case of wrong pixels
+        if next_self_hp > min_hp:
+            next_boss_hp_value = boss_hp(next_hp_station, boss_last_hp)
+            boss_last_hp = boss_hp_value
+            next_self_hp = player_hp(next_hp_station)
+
+        # in case of wrong self hp
         if min_hp == 9 and next_self_hp == 1:
             next_self_hp = 9
         
+        # get reward
         reward, done, min_hp = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, min_hp)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
+        
         DeleyReward.append(reward)
         DeleyStation.append(stations)
         DeleyActions.append(action)
@@ -225,7 +235,7 @@ if __name__ == '__main__':
     while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
         # 训练
         episode += 1     
-        if episode % 15 == 1:
+        if episode % 10 == 1:
             algorithm.replace_target()
 
         total_reward, total_step, PASS_COUNT = run_episode(algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)

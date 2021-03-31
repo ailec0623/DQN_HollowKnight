@@ -24,27 +24,24 @@ Z = 0x5A
 def Nothing():
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(RIGHT_ARROW)
-    time.sleep(0.1)
+    time.sleep(0.01)
     pass
 
 # Move
 # 0
 def Move_Left():
     ReleaseKey(RIGHT_ARROW)
-    time.sleep(0.03)
     PressKey(LEFT_ARROW)
-    time.sleep(0.02)
+    time.sleep(0.01)
 # 1
 def Move_Right():
     ReleaseKey(LEFT_ARROW)
-    time.sleep(0.03)
     PressKey(RIGHT_ARROW)
-    time.sleep(0.02)
+    time.sleep(0.01)
 
 # 2
 def Turn_Left():
     ReleaseKey(RIGHT_ARROW)
-    time.sleep(0.03)
     PressKey(LEFT_ARROW)
     time.sleep(0.01)
     ReleaseKey(LEFT_ARROW)
@@ -52,7 +49,6 @@ def Turn_Left():
 # 3
 def Turn_Right():
     ReleaseKey(LEFT_ARROW)
-    time.sleep(0.03)
     PressKey(RIGHT_ARROW)
     time.sleep(0.01)
     ReleaseKey(RIGHT_ARROW)
@@ -111,25 +107,25 @@ def Mid_Jump():
 def Skill():
     PressKey(Z)
     PressKey(X)
-    time.sleep(0.2)
+    time.sleep(0.1)
     ReleaseKey(Z)
     ReleaseKey(X)
-    time.sleep(0.1)
+    time.sleep(0.01)
 # 6
 def Skill_Up():
     PressKey(UP_ARROW)
     PressKey(Z)
     PressKey(X)
-    time.sleep(0.3)
+    time.sleep(0.15)
     ReleaseKey(UP_ARROW)
     ReleaseKey(Z)
     ReleaseKey(X)
 
     time.sleep(0.1)
     PressKey(X)
-    time.sleep(0.1)
+    time.sleep(0.01)
     ReleaseKey(X)
-    time.sleep(0.1)
+    time.sleep(0.01)
 # 7
 def Skill_Down():
     PressKey(DOWN_ARROW)
@@ -140,19 +136,19 @@ def Skill_Down():
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(Z)
     
-    for i in range(3):
+    for i in range(2):
         time.sleep(0.1)
         PressKey(X)
         time.sleep(0.15)
         ReleaseKey(X)
-    time.sleep(0.1)
+    time.sleep(0.01)
 
 
 # Rush
 # 8
 def Rush():
     PressKey(L_SHIFT)
-    time.sleep(0.45)
+    time.sleep(0.25)
     ReleaseKey(L_SHIFT)
     time.sleep(0.05)
 
@@ -196,7 +192,7 @@ def restart():
             break
         else:
             Look_up()
-            time.sleep(0.5)
+            time.sleep(0.2)
 
 
 # List for action functions
