@@ -38,7 +38,7 @@ LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新�
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
 MEMORY_WARMUP_SIZE = 12  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
 BATCH_SIZE = 8  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
-LEARNING_RATE = 0.0001  # 学习率
+LEARNING_RATE = 0.00001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
 action_name = ["Attack", "Attack_Down", "Attack_Up",
@@ -47,7 +47,7 @@ action_name = ["Attack", "Attack_Down", "Attack_Up",
 
 move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
-DELEY_REWARD = 3
+DELEY_REWARD = 2
 
 
 
