@@ -47,4 +47,8 @@
 
 - Apply RESNET
 
-- ...
+- Merge a part of action model and move model
+
+- No more Q value, reward is enough, Q value is too complex to learn.
+
+- Use kernel32 to read player Hp an hornet Hp.
