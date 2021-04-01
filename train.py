@@ -139,6 +139,7 @@ def run_episode(algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
         # check again in case of wrong pixels
         if next_self_hp > min_hp:
+            next_hp_station = cv2.cvtColor(cv2.resize(grab_screen(window_size),(HP_WIDTH,HP_HEIGHT)),cv2.COLOR_BGR2GRAY)
             next_boss_hp_value = boss_hp(next_hp_station, boss_last_hp)
             boss_last_hp = boss_hp_value
             next_self_hp = player_hp(next_hp_station)
