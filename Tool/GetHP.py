@@ -30,4 +30,29 @@ class Hp_getter():
         self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(offset_address), 4, None)
         for offset in offset_list:
           self.kernal32.ReadProcessMemory(int(self.process_handle), offset_address.value + offset, ctypes.byref(offset_address), 4, None)
+        if offset_address.value > 900:
+          return 900
+        elif offset_address.value < 0:
+          return 0
         return offset_address.value
+
+
+    def get_play_location(self):
+        base_address = 0x7B560000 + 0xF9D918
+        x = ctypes.c_long()
+        offset_list = [0x40, 0x268, 0x2F8, 0x18, 0x44, 0x60]
+        self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(x), 4, None)
+        for offset in offset_list:
+          self.kernal32.ReadProcessMemory(int(self.process_handle), x.value + offset, ctypes.byref(x), 4, None)
+        
+        base_address = 0x7B560000 + 0xF9D918
+        y = ctypes.c_long()
+        offset_list = [0x40, 0x328, 0x32C, 0x68, 0x40, 0x308]
+        self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(y), 4, None)
+        for offset in offset_list:
+          self.kernal32.ReadProcessMemory(int(self.process_handle), y.value + offset, ctypes.byref(y), 4, None)
+        
+        
+        
+        
+        return x.value, y.value

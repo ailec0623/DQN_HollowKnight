@@ -117,16 +117,9 @@ class DQN:
     def move_learn(self,obs,action,reward,next_obs,terminal):
         """ 使用DQN算法更新self.move_model的value网络
         """
-
-        # 每隔200个training steps同步一次model和target_model的参数
-        # if self.move_global_step % self.update_target_steps == 0:
-        #     self.move_replace_target()
-
-
-        # 从target_model中获取 max Q' 的值，用于计算target_Q
         self.move_train_model(action,obs,reward,epochs=1)
         self.move_global_step += 1
-        # print('finish')
+
     def move_replace_target(self):
         '''预测模型权重更新到target模型权重'''
         

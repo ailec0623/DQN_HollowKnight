@@ -2,12 +2,11 @@
 
 import cv2
 import time
-from Tool.GetHP import boss_hp, player_hp
+from Tool.GetHP import Hp_getter
 from Tool.UserInput import User
 from Tool.WindowsAPI import grab_screen
 from Tool.Actions import take_action, restart, take_direction
 from Tool.Helper import pause_game
-from Tool.GetHP_WIN import Hp_getter
 import os
 
 # from Model import Model
@@ -84,7 +83,7 @@ import os
 h = Hp_getter()
 
 while True:
-    print(h.get_boss_hp())
+    print(h.get_play_location())
     # hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_RGBA2RGB)
     # fn = "./test_img/" + str(i) + ".png"
     # cv2.imwrite(fn, hp_station)
