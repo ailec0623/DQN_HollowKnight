@@ -40,7 +40,7 @@ class Hp_getter():
     def get_play_location(self):
         base_address = 0x7B560000 + 0xF9D918
         x = ctypes.c_long()
-        offset_list = [0x40, 0x268, 0x2F8, 0x18, 0x44, 0x60]
+        offset_list = [0x40, 0x248, 0x168, 0xC, 0x8, 0x1B4]
         self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(x), 4, None)
         for offset in offset_list:
           self.kernal32.ReadProcessMemory(int(self.process_handle), x.value + offset, ctypes.byref(x), 4, None)
@@ -51,8 +51,24 @@ class Hp_getter():
         self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(y), 4, None)
         for offset in offset_list:
           self.kernal32.ReadProcessMemory(int(self.process_handle), y.value + offset, ctypes.byref(y), 4, None)
+
         
+        return x.value, y.value
+
+    def get_hornet_location(self):
+        base_address = 0x7B560000 + 0x00FEF994
+        x = ctypes.c_long()
+        offset_list = [0x20, 0x54, 0x24, 0x20, 0x5C, 0x2C]
+        self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(x), 4, None)
+        for offset in offset_list:
+          self.kernal32.ReadProcessMemory(int(self.process_handle), x.value + offset, ctypes.byref(x), 4, None)
         
-        
+        base_address = 0x7B560000 + 0x00FEF994
+        y = ctypes.c_long()
+        offset_list = [0x24, 0x1B0, 0x1C, 0x14, 0x18, 0x2C, 0xC]
+        self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(y), 4, None)
+        for offset in offset_list:
+          self.kernal32.ReadProcessMemory(int(self.process_handle), y.value + offset, ctypes.byref(y), 4, None)
+
         
         return x.value, y.value
