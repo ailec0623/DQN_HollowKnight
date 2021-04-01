@@ -147,47 +147,47 @@ class Model:
 
 
 
-        # ------------------ build target_model ------------------
-       # shared part
+    #     # ------------------ build target_model ------------------
+    #    # shared part
        
-        self.shared_target_model = models.Sequential()
-        # pre-process block
-        self.shared_target_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
-        self.shared_target_model.add(BatchNormalization(name='b1'))
-        self.shared_target_model.add(Activation('relu'))
-        self.shared_target_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+    #     self.shared_target_model = models.Sequential()
+    #     # pre-process block
+    #     self.shared_target_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+    #     self.shared_target_model.add(BatchNormalization(name='b1'))
+    #     self.shared_target_model.add(Activation('relu'))
+    #     self.shared_target_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
         
-        # resnet blocks
-        self.shared_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        self.shared_target_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
-        self.shared_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+    #     # resnet blocks
+    #     self.shared_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+    #     self.shared_target_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+    #     self.shared_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
 
-        # output layer for action model
-        self.private_act_target_model = models.Sequential()
-        self.private_act_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
-        self.private_act_target_model.add(GlobalAveragePooling3D())
-        # self.private_act_target_model.add(Reshape((1, -1)))
-        # self.private_act_target_model.add(CuDNNLSTM(32))
-        self.private_act_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+    #     # output layer for action model
+    #     self.private_act_target_model = models.Sequential()
+    #     self.private_act_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
+    #     self.private_act_target_model.add(GlobalAveragePooling3D())
+    #     # self.private_act_target_model.add(Reshape((1, -1)))
+    #     # self.private_act_target_model.add(CuDNNLSTM(32))
+    #     self.private_act_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
 
-        # action model
-        self.act_target_model = models.Sequential()
-        self.act_target_model.add(self.shared_target_model)
-        self.act_target_model.add(self.private_act_target_model)
+    #     # action model
+    #     self.act_target_model = models.Sequential()
+    #     self.act_target_model.add(self.shared_target_model)
+    #     self.act_target_model.add(self.private_act_target_model)
  
 
-        # output layer for move model
-        self.private_move_target_model = models.Sequential()
-        self.private_move_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
-        self.private_move_target_model.add(GlobalAveragePooling3D())
-        # self.private_move_target_model.add(Reshape((1, -1)))
-        # self.private_move_target_model.add(CuDNNLSTM(32))
-        self.private_move_target_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+    #     # output layer for move model
+    #     self.private_move_target_model = models.Sequential()
+    #     self.private_move_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
+    #     self.private_move_target_model.add(GlobalAveragePooling3D())
+    #     # self.private_move_target_model.add(Reshape((1, -1)))
+    #     # self.private_move_target_model.add(CuDNNLSTM(32))
+    #     self.private_move_target_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
 
-        # action model
-        self.move_target_model = models.Sequential()
-        self.move_target_model.add(self.shared_target_model)
-        self.move_target_model.add(self.private_move_target_model)
+    #     # action model
+    #     self.move_target_model = models.Sequential()
+    #     self.move_target_model.add(self.shared_target_model)
+    #     self.move_target_model.add(self.private_move_target_model)
 
 
     def predict(self, input):

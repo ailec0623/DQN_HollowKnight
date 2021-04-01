@@ -204,8 +204,8 @@ if __name__ == '__main__':
     while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
         # 训练
         episode += 1     
-        if episode % 20 == 1:
-            algorithm.replace_target()
+        # if episode % 20 == 1:
+        #     algorithm.replace_target()
 
         total_reward, total_step, PASS_COUNT = run_episode(hp, algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)
 

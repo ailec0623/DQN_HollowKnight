@@ -56,12 +56,9 @@ class DQN:
         #     self.act_replace_target()
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
-        next_pred_value = self.act_target_model.predict(next_obs)        
-        best_v = tf.reduce_max(next_pred_value,axis=1)
-        terminal = tf.cast(terminal,dtype=tf.float32)
-        target = reward + self.gamma * best_v
 
-        self.act_train_model(action,obs,target,epochs=1)
+
+        self.act_train_model(action,obs,reward,epochs=1)
         self.act_global_step += 1
         # print('finish')
     def act_replace_target(self):
@@ -127,11 +124,7 @@ class DQN:
 
 
         # 从target_model中获取 max Q' 的值，用于计算target_Q
-        next_pred_value = self.move_target_model.predict(next_obs)        
-        best_v = tf.reduce_max(next_pred_value,axis=1)
-        target = reward + self.gamma * best_v
-
-        self.move_train_model(action,obs,target,epochs=1)
+        self.move_train_model(action,obs,reward,epochs=1)
         self.move_global_step += 1
         # print('finish')
     def move_replace_target(self):
