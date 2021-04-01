@@ -115,12 +115,11 @@ class Model:
         
         # resnet blocks
         self.shared_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        
+        self.shared_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
 
         # output layer for action model
         self.private_act_model = models.Sequential()
-        self.private_act_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
-        self.private_act_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
         self.private_act_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
         self.private_act_model.add(GlobalAveragePooling3D())
         # self.private_act_model.add(Reshape((1, -1)))
@@ -134,8 +133,6 @@ class Model:
 
         # output layer for move model
         self.private_move_model = models.Sequential()
-        self.private_move_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
-        self.private_move_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
         self.private_move_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
         self.private_move_model.add(GlobalAveragePooling3D())
         # self.private_move_model.add(Reshape((1, -1)))
@@ -162,12 +159,11 @@ class Model:
         
         # resnet blocks
         self.shared_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        
+        self.shared_target_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.shared_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
 
         # output layer for action model
         self.private_act_target_model = models.Sequential()
-        self.private_act_target_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
-        self.private_act_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
         self.private_act_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
         self.private_act_target_model.add(GlobalAveragePooling3D())
         # self.private_act_target_model.add(Reshape((1, -1)))
@@ -182,8 +178,6 @@ class Model:
 
         # output layer for move model
         self.private_move_target_model = models.Sequential()
-        self.private_move_target_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
-        self.private_move_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
         self.private_move_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
         self.private_move_target_model.add(GlobalAveragePooling3D())
         # self.private_move_target_model.add(Reshape((1, -1)))
