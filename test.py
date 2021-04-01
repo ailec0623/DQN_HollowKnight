@@ -7,6 +7,7 @@ from Tool.UserInput import User
 from Tool.WindowsAPI import grab_screen
 from Tool.Actions import take_action, restart, take_direction
 from Tool.Helper import pause_game
+from Tool.GetHP_WIN import Hp_getter
 import os
 
 # from Model import Model
@@ -65,26 +66,30 @@ import os
 
 
 
-window_size = (0,0,1920,1017)
-station_size = (230, 230, 1670, 930)
-WIDTH = 400
-HEIGHT = 200
+# window_size = (0,0,1920,1017)
+# station_size = (230, 230, 1670, 930)
+# WIDTH = 400
+# HEIGHT = 200
 
-hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
-# boss_blood = boss_hp(hp_station, 570)
-# last_hp = boss_blood
-# next_self_blood  = player_hp(hp_station)
+# hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_BGR2GRAY)
+# # boss_blood = boss_hp(hp_station, 570)
+# # last_hp = boss_blood
+# # next_self_blood  = player_hp(hp_station)
 
-min_hp = 9
+# min_hp = 9
 
-check_point = (612, 187)
-start_time = time.time()
-for i in range(10):
-    hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_RGBA2RGB)
-    fn = "./test_img/" + str(i) + ".png"
-    cv2.imwrite(fn, hp_station)
-    time.sleep(0.02)
-print(time.time() - start_time)
+# check_point = (612, 187)
+# start_time = time.time()
+
+h = Hp_getter()
+
+while True:
+    print(h.get_boss_hp())
+    # hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_RGBA2RGB)
+    # fn = "./test_img/" + str(i) + ".png"
+    # cv2.imwrite(fn, hp_station)
+    # time.sleep(0.02)
+    # print(time.time() - start_time)
     # print(hp_station[401][97], " ", hp_station[401][98]," ", hp_station[401][99])
     # station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(WIDTH,HEIGHT))
     # print(hp_station[187][300])

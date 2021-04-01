@@ -34,6 +34,7 @@ class FrameBuffer(threading.Thread):
   def run(self):
     while not self.stopped():
       self.get_frame()
+      time.sleep(0.02)
     self.srcdc.DeleteDC()
     self.memdc.DeleteDC()
     win32gui.ReleaseDC(self.hwnd, self.hwindc)

@@ -90,12 +90,7 @@ class DQN:
 
 
     # train functions for move_model
-    def move_plot_loss(self):
-        import matplotlib.pyplot as plt
-        plt.plot(np.array(range(len(self.model.move_loss)), self.model.move_loss))
-        plt.ylabel("Loss")
-        plt.xlabel('training steps')
-        plt.show()
+
     def move_predict(self, obs):
         """ 使用self.move_model的value网络来获取 [Q(s,a1),Q(s,a2),...]
         """
@@ -134,7 +129,6 @@ class DQN:
         # 从target_model中获取 max Q' 的值，用于计算target_Q
         next_pred_value = self.move_target_model.predict(next_obs)        
         best_v = tf.reduce_max(next_pred_value,axis=1)
-        terminal = tf.cast(terminal,dtype=tf.float32)
         target = reward + self.gamma * best_v
 
         self.move_train_model(action,obs,target,epochs=1)
