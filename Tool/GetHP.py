@@ -31,9 +31,9 @@ class Hp_getter():
         for offset in offset_list:
           self.kernal32.ReadProcessMemory(int(self.process_handle), offset_address.value + offset, ctypes.byref(offset_address), 4, None)
         if offset_address.value > 900:
-          return 900
+          return 901
         elif offset_address.value < 0:
-          return 0
+          return -1
         return offset_address.value
 
 
