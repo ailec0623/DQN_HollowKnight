@@ -5,9 +5,7 @@ class DQN:
         self.model = model
         self.act_dim = model.act_dim
         self.act_model = model.act_model
-        self.act_target_model = model.act_target_model
         self.move_model = model.move_model
-        self.move_target_model = model.move_target_model
         self.gamma = gamma
         self.lr = learnging_rate
         # --------------------------训练模型--------------------------- # 
