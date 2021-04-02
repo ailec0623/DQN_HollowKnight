@@ -19,25 +19,28 @@ def mean(d):
 
 # count play hp change, and give reward 
 def count_self_reward(next_self_blood, self_hp):
-    self_blood_reward = 11 * (next_self_blood - self_hp)
-    return self_blood_reward
+    if next_self_blood - self_hp < 0:
+        return 11 * (next_self_blood - self_hp)
+    return 0
 
 # count boss hp change, and give reward 
 def count_boss_reward(next_boss_blood, boss_blood):
-    return int((boss_blood - next_boss_blood)/9)
+    if next_boss_blood -  boss_blood < 0:
+        return int((boss_blood - next_boss_blood)/9)
+    return 0
 
 # JUDGEMENT FUNCTION, write yourself
 def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood):
     # get action reward
     # Player dead
-    if next_self_blood == 0:    
+    if next_self_blood <= 0:    
         print("Player dead.")
         reward = -11
         done = 1
         
         return reward, done
     #boss dead
-    elif next_boss_blood <= 0 or next_boss_blood > 1000:   
+    elif next_boss_blood <= 0 or next_boss_blood > 900:   
 
         reward = 20
         done = 2
@@ -47,7 +50,6 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood):
     else:
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
-        print(self_blood_reward, " ", boss_blood_reward)
         reward = self_blood_reward + boss_blood_reward
         done = 0
         return reward, done

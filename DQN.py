@@ -1,13 +1,11 @@
 import tensorflow as tf
 import numpy as np
 class DQN:
-    def __init__(self,model,gamma=0.9,learnging_rate=0.000001):
+    def __init__(self,model,gamma=0.9,learnging_rate=0.0001):
         self.model = model
         self.act_dim = model.act_dim
         self.act_model = model.act_model
-        self.act_target_model = model.act_target_model
         self.move_model = model.move_model
-        self.move_target_model = model.move_target_model
         self.gamma = gamma
         self.lr = learnging_rate
         # --------------------------训练模型--------------------------- # 
