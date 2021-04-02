@@ -47,7 +47,11 @@
 
 - Apply RESNET
 
+- Add LSTM layers
+
 - Merge a part of action model and move model
+
+- Remvoe LSTM layers
 
 - No more Q value, reward is enough, Q value is too complex to learn.
 
