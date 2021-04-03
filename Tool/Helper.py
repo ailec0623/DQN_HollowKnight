@@ -40,7 +40,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood):
         
         return reward, done
     #boss dead
-    elif next_boss_blood <= 0 or next_boss_blood > 900:   
+    elif next_boss_blood < 0 or next_boss_blood > 900:   
         reward = 3
         done = 2
         print("Boss dead.")
