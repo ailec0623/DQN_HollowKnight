@@ -25,7 +25,11 @@ def count_self_reward(next_self_blood, self_hp):
 
 # count boss hp change, and give reward 
 def count_boss_reward(next_boss_blood, boss_blood):
+<<<<<<< HEAD
     if next_boss_blood -  boss_blood < 0:
+=======
+    if boss_blood - next_boss_blood > 0:
+>>>>>>> 652e9b81684ad7228a2c6978cfa977eb0a2b35cc
         return int((boss_blood - next_boss_blood)/9)
     return 0
 
@@ -40,7 +44,12 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood):
         
         return reward, done
     #boss dead
+<<<<<<< HEAD
     elif next_boss_blood <= 0 or next_boss_blood > 900:   
+=======
+    elif next_boss_blood < 0 or next_boss_blood > 900:   
+>>>>>>> 652e9b81684ad7228a2c6978cfa977eb0a2b35cc
+
         reward = 20
         done = 2
         print("Boss dead.")
