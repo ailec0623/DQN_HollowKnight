@@ -24,9 +24,9 @@ class Hp_getter():
 
     # This function can only get hp of hornet yet
     def get_boss_hp(self):
-        base_address = 0x7B560000 + 0xFEF994
+        base_address = 0x10000000 + 0x0020B504
         offset_address = ctypes.c_long()
-        offset_list = [0x54, 0x8, 0x1C, 0xFC, 0x18, 0xAC]
+        offset_list = [0x10, 0x810, 0x10, 0x20, 0x10, 0xAC]
         self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(offset_address), 4, None)
         for offset in offset_list:
           self.kernal32.ReadProcessMemory(int(self.process_handle), offset_address.value + offset, ctypes.byref(offset_address), 4, None)
