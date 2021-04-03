@@ -13,6 +13,7 @@
 ## Usage
 
 - Now I only write train.py but no test.py(the file is just test some base functions not for model), your can write it by yourself if you get a good model.
+- I upload save file, if you never played this game, please mvoe /save_file/user3.dat into save folder(C:\\user\\_username_\\AppData\\LocalLow\\Team Cherry\\Hollow Knight)
 - Adjust the game resolution to 1920*1017 (If not, you have to rewrite hp calculate function by yourself)
 - Run train.py
 - Keep the game window at the forefront (Since I cannot send keyboard event in the background, I tried PossMassage() in win32 API, but it did not work well.

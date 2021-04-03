@@ -29,7 +29,7 @@ class Agent:
         else:
             act = np.argmax(pred_act)
         self.e_greed = max(
-            0.05, self.e_greed - self.e_greed_decrement)  
+            0.01, self.e_greed - self.e_greed_decrement)  
         return move, act
     
 

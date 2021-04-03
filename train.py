@@ -188,7 +188,7 @@ if __name__ == '__main__':
         print("model exists , load model\n")
         model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.6,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()
