@@ -83,7 +83,12 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     
     thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE)
     thread1.start()
-    # move direction of player 0 for stay, 1 for left, 2 for right
+
+    while True:
+        boss_hp_value = hp.get_boss_hp()
+        if boss_hp_value == 900:
+            break
+        
     while True:
         
         start_time = time.time()
