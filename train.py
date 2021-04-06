@@ -81,14 +81,16 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     DeleyActions = collections.deque(maxlen=DELEY_REWARD)
     DeleyDirection = collections.deque(maxlen=DELEY_REWARD)
     
+    while True:
+        boss_hp_value = hp.get_boss_hp()
+        if boss_hp_value <= 900 and boss_hp_value >= 0:
+            break
+        
+
     thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE)
     thread1.start()
 
-    while True:
-        boss_hp_value = hp.get_boss_hp()
-        if boss_hp_value == 900:
-            break
-        
+
     while True:
         
         start_time = time.time()
@@ -128,7 +130,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         DeleyDirection.append(move)
 
 
-        if len(DeleyReward) >= DELEY_REWARD:
+        if len(DeleyReward) >= DELEY_REWARD and mean(DeleyReward) != 0:
             move_rmp.append((DeleyStation[0],DeleyDirection[0],mean(DeleyReward),DeleyStation[1],done))
             act_rmp.append((DeleyStation[0],DeleyActions[0],mean(DeleyReward),DeleyStation[1],done))
 
@@ -193,7 +195,7 @@ if __name__ == '__main__':
         print("model exists , load model\n")
         model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.6,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()
