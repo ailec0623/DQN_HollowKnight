@@ -3,10 +3,8 @@ import win32api
 import win32process
 import ctypes
 
-
 Psapi = ctypes.WinDLL('Psapi.dll')
 Kernel32 = ctypes.WinDLL('kernel32.dll')
-
 PROCESS_QUERY_INFORMATION = 0x0400
 PROCESS_VM_READ = 0x0010
 
@@ -25,7 +23,6 @@ def EnumProcessModulesEx(hProcess):
         count = needed.value // (buf_size // buf_count)
         return map(ctypes.wintypes.HMODULE, buf[:count])
 
-
 class Hp_getter():
     def __init__(self):
         hd = win32gui.FindWindow(None, "Hollow Knight")
@@ -33,10 +30,10 @@ class Hp_getter():
         self.process_handle = win32api.OpenProcess(0x1F0FFF, False, pid)
         self.kernal32 = ctypes.windll.LoadLibrary(r"C:\\Windows\\System32\\kernel32.dll")
 
+        # get dll address
         hProcess = Kernel32.OpenProcess(
         PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
         False, pid)
-
         hModule  = EnumProcessModulesEx(hProcess)
         for i in hModule:
           temp = win32process.GetModuleFileNameEx(self.process_handle,i.value)
@@ -57,7 +54,7 @@ class Hp_getter():
 
     # This function can only get hp of hornet yet
     def get_boss_hp(self):
-        base_address = self.UnityPlayer + 0x00FEF994 # if you get error here, you need to find address of "UnityPlayer.dll" in hollow knight process and replace it with 0x79800000
+        base_address = self.UnityPlayer + 0x00FEF994 
         offset_address = ctypes.c_long()
         offset_list = [0x54, 0x8, 0x1C, 0x1C, 0x7C, 0x18, 0xAC]
         self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(offset_address), 4, None)
@@ -69,7 +66,7 @@ class Hp_getter():
           return -1
         return offset_address.value
 
-
+    # the methods below can not work yet
     def get_play_location(self):
         x = ctypes.c_long()
         x.value += self.UnityPlayer + 0xF9D918
@@ -80,9 +77,7 @@ class Hp_getter():
         for offset in offset_list:
           self.kernal32.ReadProcessMemory(int(self.process_handle), x.value + offset, ctypes.byref(x), 4, None)
           print(x.value)
-
-
-        
+          
         y = ctypes.c_long()
         y.value += self.UnityPlayer + 0x0FEF994
         offset_list = [0x40, 0x328, 0x32C, 0x68, 0x40, 0x308]
