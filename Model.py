@@ -11,15 +11,15 @@ class BasicBlock(layers.Layer):
         self.stride = stride
         self.layers = []
         self.conv1=layers.Conv3D(filter_num,(2,3,3),strides=(1,stride,stride),padding='same', name = name+'_1')
-        self.bn1=layers.BatchNormalization()
+        # self.bn1=layers.BatchNormalization()
         self.relu=layers.Activation('relu')
 
         self.conv2=layers.Conv3D(filter_num,(2,3,3),strides=1,padding='same', name = name+'_2')
-        self.bn2 = layers.BatchNormalization()
+        # self.bn2 = layers.BatchNormalization()
         self.layers.append(self.conv1)
         self.layers.append(self.conv2)
-        self.layers.append(self.bn1)
-        self.layers.append(self.bn2)
+        # self.layers.append(self.bn1)
+        # self.layers.append(self.bn2)
         if stride!=1:
             self.downsample=models.Sequential()
             self.downsample.add(layers.Conv3D(filter_num,(1,1,1),strides=(1,stride,stride)))
@@ -35,11 +35,11 @@ class BasicBlock(layers.Layer):
 
     def call(self,input,training=None):
         out=self.conv1(input)
-        out=self.bn1(out)
+        # out=self.bn1(out)
         out=self.relu(out)
 
         out=self.conv2(out)
-        out=self.bn2(out)
+        # out=self.bn2(out)
 
         identity=self.downsample(input)
         output=layers.add([out,identity])

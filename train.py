@@ -54,7 +54,6 @@ DELEY_REWARD = 2
 
 def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     restart()
-    
     # learn while load game
     for i in range(3):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
@@ -69,7 +68,6 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
     
-
     step = 0
     done = 0
     total_reward = 0
@@ -92,7 +90,6 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
     while True:
-        
         start_time = time.time()
         step += 1
         # last_time = time.time()
