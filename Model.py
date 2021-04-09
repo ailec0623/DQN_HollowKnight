@@ -70,23 +70,23 @@ class Model:
         # self.act_model = tf.saved_model.load('/model/dqn_act_model.pb')
         # self.move_model = tf.saved_model.load('/model/dqn_move_model.pb')
 
-        self.shared_model = load_model("./model/shared_model.h5", custom_objects={'BasicBlock': BasicBlock})
+        # self.shared_model = load_model("./model/shared_model.h5", custom_objects={'BasicBlock': BasicBlock})
         self.private_act_model = load_model("./model/act_part.h5", custom_objects={'BasicBlock': BasicBlock})
         self.private_move_model = load_model("./model/move_part.h5", custom_objects={'BasicBlock': BasicBlock})
 
         self.act_model = models.Sequential()
-        self.act_model.add(self.shared_model)
+        # self.act_model.add(self.shared_model)
         self.act_model.add(self.private_act_model)
 
         self.move_model = models.Sequential()
-        self.move_model.add(self.shared_model)
+        # self.move_model.add(self.shared_model)
         self.move_model.add(self.private_move_model)
 
     def save_mode(self):
         # tf.saved_model.save(self.act_model, '/model/dqn_act_model.pb')
         # tf.saved_model.save(self.move_model, '/model/dqn_move_model.pb')
         print("save model")
-        self.shared_model.save("./model/shared_model.h5")
+        # self.shared_model.save("./model/shared_model.h5")
         self.private_act_model.save("./model/act_part.h5")
         self.private_move_model.save("./model/move_part.h5")
 
@@ -105,21 +105,34 @@ class Model:
 
        # ------------------ build evaluate_net ------------------
 
-       # shared part
+       
         self.shared_model = models.Sequential()
+        self.private_act_model = models.Sequential()
+        self.private_move_model = models.Sequential()
+
+        # shared part
         # pre-process block
-        self.shared_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
-        self.shared_model.add(BatchNormalization(name='b1'))
-        self.shared_model.add(Activation('relu'))
-        self.shared_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        # self.shared_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # # self.shared_model.add(BatchNormalization(name='b1'))
+        # self.shared_model.add(Activation('relu'))
+        # self.shared_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
         
-        # resnet blocks
-        self.shared_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        self.shared_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
-        self.shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        # # resnet blocks
+        # self.shared_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        # self.shared_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        # self.shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
 
         # output layer for action model
-        self.private_act_model = models.Sequential()
+        self.private_act_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # self.private_act_model.add(BatchNormalization(name='b1'))
+        self.private_act_model.add(Activation('relu'))
+        self.private_act_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        
+        # resnet blocks
+        self.private_act_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        self.private_act_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.private_act_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+
         self.private_act_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
         self.private_act_model.add(GlobalAveragePooling3D())
         # self.private_act_model.add(Reshape((1, -1)))
@@ -127,12 +140,20 @@ class Model:
         self.private_act_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))        # action model
         
         self.act_model = models.Sequential()
-        self.act_model.add(self.shared_model)
+        # self.act_model.add(self.shared_model)
         self.act_model.add(self.private_act_model)
  
 
         # output layer for move model
-        self.private_move_model = models.Sequential()
+        self.private_move_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # self.private_move_model.add(BatchNormalization(name='b1'))
+        self.private_move_model.add(Activation('relu'))
+        self.private_move_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        
+        # resnet blocks
+        self.private_move_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        self.private_move_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.private_move_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
         self.private_move_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
         self.private_move_model.add(GlobalAveragePooling3D())
         # self.private_move_model.add(Reshape((1, -1)))
@@ -141,7 +162,7 @@ class Model:
 
         # action model
         self.move_model = models.Sequential()
-        self.move_model.add(self.shared_model)
+        # self.move_model.add(self.shared_model)
         self.move_model.add(self.private_move_model)
 
 
@@ -193,7 +214,7 @@ class Model:
     def predict(self, input):
         
         input = tf.expand_dims(input,axis=0)
-        shard_output = self.shared_model.predict(input)
-        pred_move = self.private_move_model(shard_output)
-        pred_act = self.private_act_model(shard_output)
+        # shard_output = self.shared_model.predict(input)
+        pred_move = self.private_move_model(input)
+        pred_act = self.private_act_model(input)
         return pred_move, pred_act

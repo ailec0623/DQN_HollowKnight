@@ -29,12 +29,48 @@ def count_boss_reward(next_boss_blood, boss_blood):
         return int((boss_blood - next_boss_blood)/9)
     return 0
 
+def direction_reward(move, player_x, hornet_x):
+    dire = 0
+    s = 0
+    dis = 0
+    base = 5
+    if abs(player_x - hornet_x) < 1.8:
+        dis = -1
+    else:
+        dis = 1
+    if player_x - hornet_x > 0:
+        s = -1
+    else:
+        s = 1
+    if move == 0 or move == 2:
+        dire = -1
+    else:
+        dire = 1
+
+    return dire * s * dis * base
+
+
+def distance_reward(move, next_player_x, next_hornet_x):
+    if abs(next_player_x - next_hornet_x) < 1.8:
+        return -6
+    elif abs(next_player_x - next_hornet_x) < 4.8:
+        return 4
+    else:
+        if move < 2:
+            return 4
+        else:
+            return -2
+
+def move_judge(player_x, next_player_x, hornet_x, next_hornet_x, move):
+    reward = direction_reward(move, player_x, hornet_x) + distance_reward(move, player_x, hornet_x)
+    return reward
+
 # JUDGEMENT FUNCTION, write yourself
 def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood):
     # get action reward
     # Player dead
-    if next_self_blood <= 0:    
-        print("Player dead.")
+    if next_self_blood <= 0 and self_blood != 9:    
+        print("Player dead. ")
         reward = -11
         done = 1
         

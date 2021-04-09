@@ -36,8 +36,8 @@ INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 12  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 8  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+MEMORY_WARMUP_SIZE = 24  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
+BATCH_SIZE = 24  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.00001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
@@ -55,7 +55,7 @@ DELEY_REWARD = 2
 def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     restart()
     # learn while load game
-    for i in range(3):
+    for i in range(2):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
@@ -74,14 +74,16 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
     start_time = time.time()
     # Deley Reward
-    DeleyReward = collections.deque(maxlen=DELEY_REWARD)
+    DeleyMoveReward = collections.deque(maxlen=DELEY_REWARD)
+    DeleyActReward = collections.deque(maxlen=DELEY_REWARD)
     DeleyStation = collections.deque(maxlen=DELEY_REWARD + 1) # 1 more for next_station
     DeleyActions = collections.deque(maxlen=DELEY_REWARD)
     DeleyDirection = collections.deque(maxlen=DELEY_REWARD)
     
     while True:
         boss_hp_value = hp.get_boss_hp()
-        if boss_hp_value <= 900 and boss_hp_value >= 0:
+        self_hp = hp.get_self_hp()
+        if boss_hp_value == 900 and self_hp >= 1 and self_hp <= 9:
             break
         
 
@@ -90,6 +92,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
     while True:
+        print(time.time() - start_time)
         start_time = time.time()
         step += 1
         # last_time = time.time()
@@ -104,6 +107,9 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         stations = thread1.get_buffer()
         boss_hp_value = hp.get_boss_hp()
         self_hp = hp.get_self_hp()
+        player_x, player_y = hp.get_play_location()
+        hornet_x, hornet_y = hp.get_hornet_location()
+
 
         move, action = agent.sample(stations)
 
@@ -112,24 +118,30 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         
         
         next_station = thread1.get_buffer()
-
         next_boss_hp_value = hp.get_boss_hp()
         next_self_hp = hp.get_self_hp()
-        
+        next_player_x, next_player_y = hp.get_play_location()
+        next_hornet_x, next_hornet_y = hp.get_hornet_location()
+
+
         # get reward
-        reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp)
+        move_reward = Tool.Helper.move_judge(player_x, next_player_x, hornet_x, next_hornet_x, move)
+
+        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
         
-        DeleyReward.append(reward)
+        DeleyMoveReward.append(move_reward)
+        DeleyActReward.append(act_reward)
         DeleyStation.append(stations)
         DeleyActions.append(action)
         DeleyDirection.append(move)
 
+        if len(DeleyActReward) >= DELEY_REWARD:
+            move_rmp.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
 
-        if len(DeleyReward) >= DELEY_REWARD and mean(DeleyReward) != 0:
-            move_rmp.append((DeleyStation[0],DeleyDirection[0],mean(DeleyReward),DeleyStation[1],done))
-            act_rmp.append((DeleyStation[0],DeleyActions[0],mean(DeleyReward),DeleyStation[1],done))
+        if len(DeleyActReward) >= DELEY_REWARD and mean(DeleyActReward) != 0:
+            act_rmp.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
 
         station = next_station
         self_hp = next_self_hp
@@ -141,7 +153,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         #     batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
         #     algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
-        total_reward += reward
+        total_reward += act_reward
         paused = Tool.Helper.pause_game(paused)
 
         if done == 1:
@@ -156,7 +168,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     thread1.stop()
 
     # learn while loading
-    for i in range(4):
+    for i in range(2):
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
