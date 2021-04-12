@@ -14,7 +14,7 @@
 
 - Now I only write train.py but no test.py(the file is just test some base functions not for model), your can write it by yourself if you get a good model.
 - I upload save file, if you never played this game, please mvoe /save_file/user3.dat into save folder(C:\\user\\_username_\\AppData\\LocalLow\\Team Cherry\\Hollow Knight)
-- Adjust the game resolution to 1920*1017 (If not, you have to rewrite hp calculate function by yourself)
+- Adjust the game resolution to 1920*1017 
 - Run train.py
 - Keep the game window at the forefront (Since I cannot send keyboard event in the background, I tried PossMassage() in win32 API, but it did not work well.
                                          If you have any idea about sending keyboard event in the background, please let me know)
@@ -32,7 +32,7 @@
 
 - Files in /Tool/ is for other functions we may use
 - Actions defines actions for little knight and restart game script
-- GetHp help us calculate our hp and boss hp (it may have some bugs, you can fix it by yourself)
+- GetHp help us get our hp, boss hp soul and location(it may have some bugs, you can fix it by yourself)
 - SendKey is the API we use to send keyboard event to windows system.
 - UserInput is an useless file, which I used it to train my model manually.
 - WindowsAPI is used to get screenshot of the game, and key_check() is used to check which key is pressed.
@@ -57,3 +57,11 @@
 - No more Q value, reward is enough, Q value is too complex to learn.
 
 - Use kernel32 to read player Hp an hornet Hp.
+
+- Use different criteria to evaluate move and actions.
+
+- Do not use skill without souls
+
+- Use more precise scoring standards
+
+
