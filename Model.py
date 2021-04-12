@@ -4,6 +4,7 @@ from tensorflow.keras import layers,models, regularizers
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Activation, GlobalAveragePooling2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D, Reshape
 from tensorflow.compat.v1.keras.layers import CuDNNLSTM
 import time
+import os
 class BasicBlock(layers.Layer):
     def __init__(self,filter_num,name,stride=1, **kwargs):
         super(BasicBlock, self).__init__( **kwargs)
@@ -67,28 +68,34 @@ class Model:
         self.move_loss = []
 
     def load_model(self):
-        # self.act_model = tf.saved_model.load('/model/dqn_act_model.pb')
-        # self.move_model = tf.saved_model.load('/model/dqn_move_model.pb')
 
         # self.shared_model = load_model("./model/shared_model.h5", custom_objects={'BasicBlock': BasicBlock})
-        self.private_act_model = load_model("./model/act_part.h5", custom_objects={'BasicBlock': BasicBlock})
-        self.private_move_model = load_model("./model/move_part.h5", custom_objects={'BasicBlock': BasicBlock})
+        if os.path.exists("./model/act_part.h5"):
+            print("load action model")
+            self.private_act_model = load_model("./model/act_part.h5", custom_objects={'BasicBlock': BasicBlock})
+            self.act_model = models.Sequential()
+            # self.act_model.add(self.shared_model)
+            self.act_model.add(self.private_act_model)
+        if os.path.exists("./model/move_part.h5"):
+            print("load move model")
+            self.private_move_model = load_model("./model/move_part.h5", custom_objects={'BasicBlock': BasicBlock})
+            self.move_model = models.Sequential()
+            # self.move_model.add(self.shared_model)
+            self.move_model.add(self.private_move_model)
 
-        self.act_model = models.Sequential()
-        # self.act_model.add(self.shared_model)
-        self.act_model.add(self.private_act_model)
+        
+        
+        
 
-        self.move_model = models.Sequential()
-        # self.move_model.add(self.shared_model)
-        self.move_model.add(self.private_move_model)
+        
+        
+        
 
     def save_mode(self):
-        # tf.saved_model.save(self.act_model, '/model/dqn_act_model.pb')
-        # tf.saved_model.save(self.move_model, '/model/dqn_move_model.pb')
         print("save model")
-        # self.shared_model.save("./model/shared_model.h5")
         self.private_act_model.save("./model/act_part.h5")
         self.private_move_model.save("./model/move_part.h5")
+
 
     def build_resblock(self,filter_num,blocks,name="Resnet",stride=1):
         res_blocks= models.Sequential()

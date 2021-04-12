@@ -104,7 +104,7 @@ class DQN:
         self.move_model.optimizer.apply_gradients(zip(gradients,self.move_model.trainable_variables))
         self.model.move_loss.append(loss)
         # self.move_plot_loss()
-        print("Move loss: ", loss)
+        # print("Move loss: ", loss)
         # self.move_model.train_loss.update_state(loss)
     def move_train_model(self,action,features,labels,epochs=1):
         """ 训练模型

@@ -83,9 +83,10 @@ import os
 h = Hp_getter()
 
 while True:
-    px, py = h.get_play_location()
-    hx, hy = h.get_hornet_location()
-    print(direction_reward(0, px, hx), "   ",distance_reward(0, px, hx), " ", px - hx)
+    # px, py = h.get_play_location()
+    # hx, hy = h.get_hornet_location()
+    # print(direction_reward(0, px, hx), "   ",distance_reward(0, px, hx), " ", px - hx)
+    print(h.get_souls())
     # hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_RGBA2RGB)
     # fn = "./test_img/" + str(i) + ".png"
     # cv2.imwrite(fn, hp_station)

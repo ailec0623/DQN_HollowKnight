@@ -64,14 +64,14 @@ def Attack():
     ReleaseKey(X)
     time.sleep(0.01)
 # 1
-def Attack_Down():
-    PressKey(DOWN_ARROW)
-    PressKey(X)
-    time.sleep(0.05)
-    ReleaseKey(X)
-    ReleaseKey(DOWN_ARROW)
-    time.sleep(0.01)
-# 2
+# def Attack_Down():
+#     PressKey(DOWN_ARROW)
+#     PressKey(X)
+#     time.sleep(0.05)
+#     ReleaseKey(X)
+#     ReleaseKey(DOWN_ARROW)
+#     time.sleep(0.01)
+# 1
 def Attack_Up():
     # print("Attack up--->")
     PressKey(UP_ARROW)
@@ -82,7 +82,7 @@ def Attack_Up():
     time.sleep(0.01)
 
 #JUMP
-# 3
+# 2
 def Short_Jump():
     PressKey(C)
     PressKey(DOWN_ARROW)
@@ -92,7 +92,7 @@ def Short_Jump():
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(C)
 
-# 4
+# 3
 def Mid_Jump():
     PressKey(C)
     time.sleep(0.2)
@@ -103,15 +103,15 @@ def Mid_Jump():
 
 
 # Skill
-# 5
-def Skill():
-    PressKey(Z)
-    PressKey(X)
-    time.sleep(0.1)
-    ReleaseKey(Z)
-    ReleaseKey(X)
-    time.sleep(0.01)
-# 6
+# 4
+# def Skill():
+#     PressKey(Z)
+#     PressKey(X)
+#     time.sleep(0.1)
+#     ReleaseKey(Z)
+#     ReleaseKey(X)
+#     time.sleep(0.01)
+# 4
 def Skill_Up():
     PressKey(UP_ARROW)
     PressKey(Z)
@@ -121,12 +121,8 @@ def Skill_Up():
     ReleaseKey(Z)
     ReleaseKey(X)
 
-    time.sleep(0.1)
-    PressKey(X)
-    time.sleep(0.01)
-    ReleaseKey(X)
-    time.sleep(0.01)
-# 7
+    time.sleep(0.3)
+# 5
 def Skill_Down():
     PressKey(DOWN_ARROW)
     PressKey(Z)
@@ -135,20 +131,15 @@ def Skill_Down():
     ReleaseKey(X)
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(Z)
-    
-    for i in range(2):
-        time.sleep(0.1)
-        PressKey(X)
-        time.sleep(0.15)
-        ReleaseKey(X)
-    time.sleep(0.01)
+
+    time.sleep(0.4)
 
 
 # Rush
-# 8
+# 6
 def Rush():
     PressKey(L_SHIFT)
-    time.sleep(0.25)
+    time.sleep(0.15)
     ReleaseKey(L_SHIFT)
     time.sleep(0.05)
 
@@ -196,8 +187,8 @@ def restart():
 
 
 # List for action functions
-Actions = [Attack, Attack_Down, Attack_Up,
-           Short_Jump, Mid_Jump, Skill, Skill_Up, 
+Actions = [Attack, Attack_Up,
+           Short_Jump, Mid_Jump, Skill_Up, 
            Skill_Down, Rush, Cure]
 Directions = [Move_Left, Move_Right, Turn_Left, Turn_Right]
 # Run the action

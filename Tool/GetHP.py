@@ -42,6 +42,15 @@ class Hp_getter():
             self.UnityPlayer = i.value
           if temp[-8:] == "mono.dll":
             self.mono = i.value
+    
+    def get_souls(self):
+        base_address = self.UnityPlayer + 0x00FA0998
+        offset_address = ctypes.c_long()
+        offset_list = [0x10, 0x64, 0x3C, 0xC, 0x60, 0x120]
+        self.kernal32.ReadProcessMemory(int(self.process_handle), base_address, ctypes.byref(offset_address), 4, None)
+        for offset in offset_list:
+          self.kernal32.ReadProcessMemory(int(self.process_handle), offset_address.value + offset, ctypes.byref(offset_address), 4, None)
+        return offset_address.value
 
     def get_self_hp(self):
         base_address = self.mono + 0x1F50AC

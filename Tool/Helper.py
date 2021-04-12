@@ -34,7 +34,7 @@ def direction_reward(move, player_x, hornet_x):
     s = 0
     dis = 0
     base = 5
-    if abs(player_x - hornet_x) < 1.8:
+    if abs(player_x - hornet_x) < 2:
         dis = -1
     else:
         dis = 1
@@ -51,7 +51,7 @@ def direction_reward(move, player_x, hornet_x):
 
 
 def distance_reward(move, next_player_x, next_hornet_x):
-    if abs(next_player_x - next_hornet_x) < 1.8:
+    if abs(next_player_x - next_hornet_x) < 2:
         return -6
     elif abs(next_player_x - next_hornet_x) < 4.8:
         return 4
@@ -61,28 +61,68 @@ def distance_reward(move, next_player_x, next_hornet_x):
         else:
             return -2
 
-def move_judge(player_x, next_player_x, hornet_x, next_hornet_x, move):
+def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, next_hornet_x, move):
+    reward = count_self_reward(next_self_blood, self_blood)
+    if reward < 0:
+        return reward
     reward = direction_reward(move, player_x, hornet_x) + distance_reward(move, player_x, hornet_x)
     return reward
 
 # JUDGEMENT FUNCTION, write yourself
-def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood):
+def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_hornet_x, action):
     # get action reward
     # Player dead
     if next_self_blood <= 0 and self_blood != 9:    
         print("Player dead. ")
-        reward = -11
+        distance_reward = 0
+        if abs(next_player_x - next_hornet_x) < 12:
+            distance_reward = 0
+            if abs(next_player_x - next_hornet_x) > 6:
+                if action >= 2 and action <= 3:
+                    distance_reward = 0.5
+        else:
+            if action >= 0 and action <= 1:
+                distance_reward = -1
+            elif action == 6:
+                distance_reward = 0.5
+        self_blood_reward = count_self_reward(next_self_blood, self_blood)
+        boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
+        reward = self_blood_reward + boss_blood_reward
         done = 1
         
         return reward, done
     #boss dead
     elif next_boss_blood <= 0 or next_boss_blood > 900:   
-        reward = 3
+        distance_reward = 0
+        if abs(next_player_x - next_hornet_x) < 12:
+            distance_reward = 0
+            if abs(next_player_x - next_hornet_x) > 6:
+                if action >= 2 and action <= 3:
+                    distance_reward = 0.5
+        else:
+            if action >= 0 and action <= 1:
+                distance_reward = -1
+            elif action == 6:
+                distance_reward = 0.5
+        self_blood_reward = count_self_reward(next_self_blood, self_blood)
+        boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
+        reward = self_blood_reward + boss_blood_reward
         done = 2
         print("Boss dead.")
         return reward, done
     # playing
     else:
+        distance_reward = 0
+        if abs(next_player_x - next_hornet_x) < 12:
+            distance_reward = 0
+            if abs(next_player_x - next_hornet_x) > 6:
+                if action >= 2 and action <= 3:
+                    distance_reward = 0.5
+        else:
+            if action >= 0 and action <= 1:
+                distance_reward = -1
+            elif action == 6:
+                distance_reward = 0.5
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
         reward = self_blood_reward + boss_blood_reward

@@ -30,7 +30,7 @@ HP_WIDTH = 768
 HP_HEIGHT = 407
 WIDTH = 400
 HEIGHT = 200
-ACTION_DIM = 9
+ACTION_DIM = 7
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
@@ -47,7 +47,7 @@ action_name = ["Attack", "Attack_Down", "Attack_Up",
 
 move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
-DELEY_REWARD = 2
+DELEY_REWARD = 1
 
 
 
@@ -92,8 +92,6 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
     while True:
-        print(time.time() - start_time)
-        start_time = time.time()
         step += 1
         # last_time = time.time()
         # no more than 10 mins
@@ -109,9 +107,9 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         self_hp = hp.get_self_hp()
         player_x, player_y = hp.get_play_location()
         hornet_x, hornet_y = hp.get_hornet_location()
+        soul = hp.get_souls()
 
-
-        move, action = agent.sample(stations)
+        move, action = agent.sample(stations, soul)
 
         take_direction(move)
         take_action(action)
@@ -125,9 +123,9 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
 
         # get reward
-        move_reward = Tool.Helper.move_judge(player_x, next_player_x, hornet_x, next_hornet_x, move)
+        move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move)
 
-        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp)
+        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x, action)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
         
@@ -137,10 +135,10 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         DeleyActions.append(action)
         DeleyDirection.append(move)
 
-        if len(DeleyActReward) >= DELEY_REWARD:
+        if len(DeleyStation) >= DELEY_REWARD + 1:
             move_rmp.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
 
-        if len(DeleyActReward) >= DELEY_REWARD and mean(DeleyActReward) != 0:
+        if len(DeleyStation) >= DELEY_REWARD + 1 and mean(DeleyActReward) != 0:
             act_rmp.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
 
         station = next_station
@@ -169,11 +167,11 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
     # learn while loading
     for i in range(2):
+        
         if (len(move_rmp) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
             algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
-
         if (len(act_rmp) > MEMORY_WARMUP_SIZE):
             # print("action learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
@@ -200,9 +198,8 @@ if __name__ == '__main__':
     # Hp counter
     hp = Hp_getter()
 
-    if os.path.exists("./model/shared_model.h5"):
-        print("model exists , load model\n")
-        model.load_model()
+
+    model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
     agent = Agent(ACTION_DIM,algorithm,e_greed=0.6,e_greed_decrement=1e-6)
     
