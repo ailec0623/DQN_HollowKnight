@@ -72,14 +72,15 @@ class Model:
         # self.shared_model = load_model("./model/shared_model.h5", custom_objects={'BasicBlock': BasicBlock})
         if os.path.exists("./model/act_part.h5"):
             print("load action model")
-            self.private_act_model = load_model("./model/act_part.h5", custom_objects={'BasicBlock': BasicBlock})
             self.act_model = models.Sequential()
+            self.private_act_model = load_model("./model/act_part.h5", custom_objects={'BasicBlock': BasicBlock})
             # self.act_model.add(self.shared_model)
             self.act_model.add(self.private_act_model)
+            
         if os.path.exists("./model/move_part.h5"):
             print("load move model")
-            self.private_move_model = load_model("./model/move_part.h5", custom_objects={'BasicBlock': BasicBlock})
             self.move_model = models.Sequential()
+            self.private_move_model = load_model("./model/move_part.h5", custom_objects={'BasicBlock': BasicBlock})
             # self.move_model.add(self.shared_model)
             self.move_model.add(self.private_move_model)
 
