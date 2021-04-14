@@ -20,7 +20,7 @@ def mean(d):
 # count play hp change, and give reward 
 def count_self_reward(next_self_blood, self_hp):
     if next_self_blood - self_hp < 0:
-        return 11 * (next_self_blood - self_hp)
+        return 13 * (next_self_blood - self_hp)
     return 0
 
 # count boss hp change, and give reward 
@@ -61,10 +61,35 @@ def distance_reward(move, next_player_x, next_hornet_x):
         else:
             return -2
 
-def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, next_hornet_x, move):
+def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1):
     reward = count_self_reward(next_self_blood, self_blood)
     if reward < 0:
         return reward
+
+    
+    if hornet_skill1:
+        # run away while distance < 5
+        if abs(player_x - hornet_x) < 5:
+            # change direction while hornet use skill
+            if move == 0 or move == 2:
+                dire = 1
+            else:
+                dire = -1
+            if player_x - hornet_x > 0:
+                s = -1
+            else:
+                s = 1
+            # if direction is correct and use long move
+            if dire * s == 1 and move < 2:
+                # print("correct")
+                return 10
+        # do not do long move while distance > 5
+        else:
+            if move >= 2:
+                # print("correct")
+                return 10
+        # print("wrong")
+        return -10
     reward = direction_reward(move, player_x, hornet_x) + distance_reward(move, player_x, hornet_x)
     return reward
 

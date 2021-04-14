@@ -139,9 +139,13 @@ def Skill_Down():
 # 6
 def Rush():
     PressKey(L_SHIFT)
-    time.sleep(0.15)
+    time.sleep(0.1)
     ReleaseKey(L_SHIFT)
-    time.sleep(0.05)
+    PressKey(X)
+    time.sleep(0.03)
+    ReleaseKey(X)
+    time.sleep(0.02)
+    
 
 
 
