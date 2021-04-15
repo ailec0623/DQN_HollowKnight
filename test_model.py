@@ -55,16 +55,6 @@ DELEY_REWARD = 1
 def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     restart()
     # learn while load game
-    for i in range(2):
-        if (len(move_rmp) > MEMORY_WARMUP_SIZE):
-            # print("move learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
-
-        if (len(act_rmp) > MEMORY_WARMUP_SIZE):
-            # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
 
     
@@ -83,7 +73,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     while True:
         boss_hp_value = hp.get_boss_hp()
         self_hp = hp.get_self_hp()
-        if boss_hp_value == 900 and self_hp >= 1 and self_hp <= 9:
+        if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
             break
         
 
@@ -127,7 +117,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         # get reward
         move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1)
 
-        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x, action, hornet_skill1)
+        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x, action)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
         
@@ -162,22 +152,13 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         elif done == 2:
             PASS_COUNT += 1
             Tool.Actions.Nothing()
+            time.sleep(3)
             break
 
 
     thread1.stop()
 
-    # learn while loading
-    for i in range(2):
-        
-        if (len(move_rmp) > MEMORY_WARMUP_SIZE):
-            # print("move learning")
-            batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
-        if (len(act_rmp) > MEMORY_WARMUP_SIZE):
-            # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
+    time.sleep(2)
 
     return total_reward, step, PASS_COUNT
 
@@ -203,7 +184,7 @@ if __name__ == '__main__':
 
     model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.1,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()
@@ -223,9 +204,6 @@ if __name__ == '__main__':
         #     algorithm.replace_target()
 
         total_reward, total_step, PASS_COUNT = run_episode(hp, algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)
-
-        if episode % 10 == 1:
-            model.save_mode()
                 
         print("Episode: ", episode, ", mean(reward):", total_reward/total_step,", pass_count: " , PASS_COUNT)
 

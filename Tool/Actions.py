@@ -181,6 +181,9 @@ def restart():
     while True:
         station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
         if station[187][612][0] > 200: 
+            # PressKey(DOWN_ARROW)
+            # time.sleep(0.1)
+            # ReleaseKey(DOWN_ARROW)
             PressKey(C)
             time.sleep(0.1)
             ReleaseKey(C)
