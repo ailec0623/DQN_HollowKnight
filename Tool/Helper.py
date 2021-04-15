@@ -20,7 +20,7 @@ def mean(d):
 # count play hp change, and give reward 
 def count_self_reward(next_self_blood, self_hp):
     if next_self_blood - self_hp < 0:
-        return 13 * (next_self_blood - self_hp)
+        return 15 * (next_self_blood - self_hp)
     return 0
 
 # count boss hp change, and give reward 
