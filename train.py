@@ -55,7 +55,7 @@ DELEY_REWARD = 1
 def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_correct, move_rmp_wrong,PASS_COUNT,paused):
     restart()
     # learn while load game
-    for i in range(1):
+    for i in range(2):
         if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
@@ -65,15 +65,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
             # print("action learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
             algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
-        if (len(move_rmp_wrong) > MEMORY_WARMUP_SIZE):
-            # print("move learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_wrong.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
 
-        if (len(act_rmp_wrong) > MEMORY_WARMUP_SIZE):
-            # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_wrong.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
     
     step = 0
     done = 0
@@ -145,15 +137,15 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         DeleyDirection.append(move)
 
         if len(DeleyStation) >= DELEY_REWARD + 1:
-            if DeleyMoveReward[0] > 0:
+            if DeleyMoveReward[0] != 0:
                 move_rmp_correct.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
-            if DeleyMoveReward[0] < 0:
+            if DeleyMoveReward[0] <= 0:
                 move_rmp_wrong.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
 
         if len(DeleyStation) >= DELEY_REWARD + 1:
-            if mean(DeleyActReward) > 0:
+            if mean(DeleyActReward) != 0:
                 act_rmp_correct.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
-            if mean(DeleyActReward) < 0:
+            if mean(DeleyActReward) <= 0:
                 act_rmp_wrong.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
 
         station = next_station
@@ -180,7 +172,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
 
     thread1.stop()
 
-    for i in range(1):
+    for i in range(2):
         if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
             # print("move learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
@@ -190,15 +182,15 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
             # print("action learning")
             batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
             algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
-        if (len(move_rmp_wrong) > MEMORY_WARMUP_SIZE):
-            # print("move learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_wrong.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
+    if (len(move_rmp_wrong) > MEMORY_WARMUP_SIZE):
+        # print("move learning")
+        batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_wrong.sample(1)
+        algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
 
-        if (len(act_rmp_wrong) > MEMORY_WARMUP_SIZE):
-            # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_wrong.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
+    if (len(act_rmp_wrong) > MEMORY_WARMUP_SIZE):
+        # print("action learning")
+        batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_wrong.sample(1)
+        algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
     return total_reward, step, PASS_COUNT, self_hp
 
@@ -227,7 +219,7 @@ if __name__ == '__main__':
 
     model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.01,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()

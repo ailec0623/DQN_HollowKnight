@@ -69,7 +69,7 @@ def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, n
     
     if hornet_skill1:
         # run away while distance < 5
-        if abs(player_x - hornet_x) < 5:
+        if abs(player_x - hornet_x) < 6:
             # change direction while hornet use skill
             if move == 0 or move == 2:
                 dire = 1
@@ -108,7 +108,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         if abs(next_player_x - next_hornet_x) < 12:
             if abs(next_player_x - next_hornet_x) > 6:
                 if action >= 2 and action <= 3:
-                    distance_reward += 1
+                    distance_reward += 0.5
                 elif next_hornet_y < 29 and action == 6:
                     distance_reward -= 3
         else:
@@ -139,7 +139,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         if abs(next_player_x - next_hornet_x) < 12:
             if abs(next_player_x - next_hornet_x) > 6:
                 if action >= 2 and action <= 3:
-                    distance_reward += 1
+                    distance_reward += 0.5
                 elif next_hornet_y < 29 and action == 6:
                     distance_reward -= 3
         else:
@@ -169,7 +169,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         if abs(next_player_x - next_hornet_x) < 12:
             if abs(next_player_x - next_hornet_x) > 6:
                 if action >= 2 and action <= 3:
-                    distance_reward += 1
+                    distance_reward += 0.5
                 elif next_hornet_y < 29 and action == 6:
                     distance_reward -= 3
         else:
