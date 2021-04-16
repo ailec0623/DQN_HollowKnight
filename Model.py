@@ -93,7 +93,6 @@ class Model:
         
 
     def save_mode(self):
-        print("save model")
         self.private_act_model.save("./model/act_part.h5")
         self.private_move_model.save("./model/move_part.h5")
 

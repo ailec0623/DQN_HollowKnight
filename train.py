@@ -52,21 +52,28 @@ DELEY_REWARD = 1
 
 
 
-def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
+def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_correct, move_rmp_wrong,PASS_COUNT,paused):
     restart()
     # learn while load game
-    for i in range(2):
-        if (len(move_rmp) > MEMORY_WARMUP_SIZE):
+    for i in range(1):
+        if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
             # print("move learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
             algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
 
-        if (len(act_rmp) > MEMORY_WARMUP_SIZE):
+        if (len(act_rmp_correct) > MEMORY_WARMUP_SIZE):
             # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
             algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
+        if (len(move_rmp_wrong) > MEMORY_WARMUP_SIZE):
+            # print("move learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_wrong.sample(BATCH_SIZE)
+            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
 
-
+        if (len(act_rmp_wrong) > MEMORY_WARMUP_SIZE):
+            # print("action learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_wrong.sample(BATCH_SIZE)
+            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
     
     step = 0
     done = 0
@@ -83,7 +90,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
     while True:
         boss_hp_value = hp.get_boss_hp()
         self_hp = hp.get_self_hp()
-        if boss_hp_value == 900 and self_hp >= 1 and self_hp <= 9:
+        if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
             break
         
 
@@ -127,7 +134,7 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         # get reward
         move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1)
 
-        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x, action, hornet_skill1)
+        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x,next_hornet_x, action, hornet_skill1)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
         
@@ -138,10 +145,16 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
         DeleyDirection.append(move)
 
         if len(DeleyStation) >= DELEY_REWARD + 1:
-            move_rmp.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
+            if DeleyMoveReward[0] > 0:
+                move_rmp_correct.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
+            if DeleyMoveReward[0] < 0:
+                move_rmp_wrong.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
 
-        if len(DeleyStation) >= DELEY_REWARD + 1 and mean(DeleyActReward) != 0:
-            act_rmp.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
+        if len(DeleyStation) >= DELEY_REWARD + 1:
+            if mean(DeleyActReward) > 0:
+                act_rmp_correct.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
+            if mean(DeleyActReward) < 0:
+                act_rmp_wrong.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
 
         station = next_station
         self_hp = next_self_hp
@@ -167,19 +180,27 @@ def run_episode(hp, algorithm,agent,act_rmp,move_rmp,PASS_COUNT,paused):
 
     thread1.stop()
 
-    # learn while loading
-    for i in range(2):
-        
-        if (len(move_rmp) > MEMORY_WARMUP_SIZE):
+    for i in range(1):
+        if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
             # print("move learning")
-            batch_station,batch_moveions,batch_reward,batch_next_station,batch_done = move_rmp.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_moveions,batch_reward,batch_next_station,batch_done)   
-        if (len(act_rmp) > MEMORY_WARMUP_SIZE):
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
+            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
+
+        if (len(act_rmp_correct) > MEMORY_WARMUP_SIZE):
             # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
+            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
+        if (len(move_rmp_wrong) > MEMORY_WARMUP_SIZE):
+            # print("move learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_wrong.sample(BATCH_SIZE)
+            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
+
+        if (len(act_rmp_wrong) > MEMORY_WARMUP_SIZE):
+            # print("action learning")
+            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_wrong.sample(BATCH_SIZE)
             algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
-    return total_reward, step, PASS_COUNT
+    return total_reward, step, PASS_COUNT, self_hp
 
 
 if __name__ == '__main__':
@@ -190,9 +211,12 @@ if __name__ == '__main__':
     sess = tf.compat.v1.Session(config = config)
 
     PASS_COUNT = 0                                       # pass count
+    total_remind_hp = 0
 
-    act_rmp = ReplayMemory(MEMORY_SIZE, file_name='./act_memory')         # experience pool
-    move_rmp = ReplayMemory(MEMORY_SIZE,file_name='./move_memory')         # experience pool
+    act_rmp_correct = ReplayMemory(MEMORY_SIZE, file_name='./act_correct_memory')         # experience pool
+    act_rmp_wrong = ReplayMemory(MEMORY_SIZE, file_name='./act_wrong_memory')         # experience pool
+    move_rmp_correct = ReplayMemory(MEMORY_SIZE,file_name='./move_correct_memory')         # experience pool
+    move_rmp_wrong = ReplayMemory(MEMORY_SIZE,file_name='./move_wrong_memory')         # experience pool
     
     # new model, if exit save file, load it
     model = Model(INPUT_SHAPE, ACTION_DIM)  
@@ -203,7 +227,7 @@ if __name__ == '__main__':
 
     model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.1,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()
@@ -211,7 +235,6 @@ if __name__ == '__main__':
     # paused at the begining
     paused = True
     paused = Tool.Helper.pause_game(paused)
-
 
     max_episode = 30000
     # 开始训练
@@ -222,10 +245,9 @@ if __name__ == '__main__':
         # if episode % 20 == 1:
         #     algorithm.replace_target()
 
-        total_reward, total_step, PASS_COUNT = run_episode(hp, algorithm,agent,act_rmp, move_rmp, PASS_COUNT, paused)
-
+        total_reward, total_step, PASS_COUNT, remind_hp = run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_correct, move_rmp_wrong, PASS_COUNT, paused)
         if episode % 10 == 1:
             model.save_mode()
-                
-        print("Episode: ", episode, ", mean(reward):", total_reward/total_step,", pass_count: " , PASS_COUNT)
+        total_remind_hp += remind_hp
+        print("Episode: ", episode, ", pass_count: " , PASS_COUNT, ", average remind hp:", total_remind_hp / episode)
 

@@ -91,7 +91,7 @@ def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, n
     return reward
 
 # JUDGEMENT FUNCTION, write yourself
-def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_hornet_x, action, hornet_skill1):
+def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_hornet_x,next_hornet_y, action, hornet_skill1):
     # get action reward
     # Player dead
     if next_self_blood <= 0 and self_blood != 9:    
@@ -99,18 +99,23 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         if hornet_skill1:
             if action == 2 or action == 3 or action == 6:
                 skill_reward -= 5
+        elif  next_hornet_y >34 and abs(next_hornet_x - next_player_x) < 5:
+            if action == 4:
+                skill_reward += 2
+
 
         distance_reward = 0
         if abs(next_player_x - next_hornet_x) < 12:
-            distance_reward = 0
             if abs(next_player_x - next_hornet_x) > 6:
                 if action >= 2 and action <= 3:
-                    distance_reward = 0.5
+                    distance_reward += 1
+                elif next_hornet_y < 29 and action == 6:
+                    distance_reward -= 3
         else:
-            if action >= 0 and action <= 1:
-                distance_reward = -3
+            if action == 0 and action == 1:
+                distance_reward -= 3
             elif action == 6:
-                distance_reward = 1
+                distance_reward += 1
 
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
@@ -125,18 +130,23 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         if hornet_skill1:
             if action == 2 or action == 3 or action == 6:
                 skill_reward -= 5
+        elif  next_hornet_y >34 and abs(next_hornet_x - next_player_x) < 5:
+            if action == 4:
+                skill_reward += 2
+
 
         distance_reward = 0
         if abs(next_player_x - next_hornet_x) < 12:
-            distance_reward = 0
             if abs(next_player_x - next_hornet_x) > 6:
                 if action >= 2 and action <= 3:
-                    distance_reward = 0.5
+                    distance_reward += 1
+                elif next_hornet_y < 29 and action == 6:
+                    distance_reward -= 3
         else:
-            if action >= 0 and action <= 1:
-                distance_reward = -3
+            if action == 0 and action == 1:
+                distance_reward -= 3
             elif action == 6:
-                distance_reward = 1
+                distance_reward += 1
 
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
@@ -150,18 +160,23 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         if hornet_skill1:
             if action == 2 or action == 3 or action == 6:
                 skill_reward -= 5
+        elif  next_hornet_y >34 and abs(next_hornet_x - next_player_x) < 5:
+            if action == 4:
+                skill_reward += 2
+
 
         distance_reward = 0
         if abs(next_player_x - next_hornet_x) < 12:
-            distance_reward = 0
             if abs(next_player_x - next_hornet_x) > 6:
                 if action >= 2 and action <= 3:
-                    distance_reward = 0.5
+                    distance_reward += 1
+                elif next_hornet_y < 29 and action == 6:
+                    distance_reward -= 3
         else:
-            if action >= 0 and action <= 1:
-                distance_reward = -3
+            if action == 0 and action == 1:
+                distance_reward -= 3
             elif action == 6:
-                distance_reward = 1
+                distance_reward += 1
 
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
