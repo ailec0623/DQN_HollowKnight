@@ -24,31 +24,26 @@ Z = 0x5A
 def Nothing():
     ReleaseKey(LEFT_ARROW)
     ReleaseKey(RIGHT_ARROW)
-    time.sleep(0.01)
     pass
 
 # Move
 # 0
 def Move_Left():
-    ReleaseKey(RIGHT_ARROW)
     PressKey(LEFT_ARROW)
     time.sleep(0.01)
 # 1
 def Move_Right():
-    ReleaseKey(LEFT_ARROW)
     PressKey(RIGHT_ARROW)
     time.sleep(0.01)
 
 # 2
 def Turn_Left():
-    ReleaseKey(RIGHT_ARROW)
     PressKey(LEFT_ARROW)
     time.sleep(0.01)
     ReleaseKey(LEFT_ARROW)
 
 # 3
 def Turn_Right():
-    ReleaseKey(LEFT_ARROW)
     PressKey(RIGHT_ARROW)
     time.sleep(0.01)
     ReleaseKey(RIGHT_ARROW)
@@ -60,8 +55,9 @@ def Turn_Right():
 # 0
 def Attack():
     PressKey(X)
-    time.sleep(0.05)
+    time.sleep(0.15)
     ReleaseKey(X)
+    Nothing()
     time.sleep(0.01)
 # 1
 # def Attack_Down():
@@ -76,9 +72,10 @@ def Attack_Up():
     # print("Attack up--->")
     PressKey(UP_ARROW)
     PressKey(X)
-    time.sleep(0.05)
+    time.sleep(0.11)
     ReleaseKey(X)
     ReleaseKey(UP_ARROW)
+    Nothing()
     time.sleep(0.01)
 
 #JUMP
@@ -87,11 +84,11 @@ def Short_Jump():
     PressKey(C)
     PressKey(DOWN_ARROW)
     PressKey(X)
-    time.sleep(0.2)
+    time.sleep(0.2) 
     ReleaseKey(X)
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(C)
-
+    Nothing()
 # 3
 def Mid_Jump():
     PressKey(C)
@@ -100,6 +97,7 @@ def Mid_Jump():
     time.sleep(0.2)
     ReleaseKey(X)
     ReleaseKey(C)
+    Nothing()
 
 
 # Skill
@@ -120,8 +118,8 @@ def Skill_Up():
     ReleaseKey(UP_ARROW)
     ReleaseKey(Z)
     ReleaseKey(X)
-
-    time.sleep(0.3)
+    Nothing()
+    time.sleep(0.15)
 # 5
 def Skill_Down():
     PressKey(DOWN_ARROW)
@@ -131,8 +129,8 @@ def Skill_Down():
     ReleaseKey(X)
     ReleaseKey(DOWN_ARROW)
     ReleaseKey(Z)
-
-    time.sleep(0.4)
+    Nothing()
+    time.sleep(0.3)
 
 
 # Rush
@@ -141,10 +139,11 @@ def Rush():
     PressKey(L_SHIFT)
     time.sleep(0.1)
     ReleaseKey(L_SHIFT)
+    Nothing()
     PressKey(X)
     time.sleep(0.03)
     ReleaseKey(X)
-    time.sleep(0.02)
+
     
 
 

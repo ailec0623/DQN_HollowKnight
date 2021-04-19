@@ -10,10 +10,11 @@ class Agent:
         self.e_greed_decrement = e_greed_decrement
 
 
-    def sample(self, station, soul):
+    def sample(self, station, soul, hornet_x, hornet_y, player_x):
         
         pred_move, pred_act = self.algorithm.model.predict(station)
-        # print(pred_move)
+        print(pred_move)
+        print(self.e_greed)
         pred_move = pred_move.numpy()
         pred_act = pred_act.numpy()
         sample = np.random.rand()  
@@ -27,6 +28,12 @@ class Agent:
         sample = np.random.rand() 
         if sample < self.e_greed:
             act = np.random.randint(self.act_dim)  
+            if soul < 33:
+                while act == 4 or act == 5:
+                    act = np.random.randint(self.act_dim)
+            else:
+                if hornet_y > 34 and abs(hornet_x - player_x) < 5:
+                    act = 4
         else:
             act = np.argmax(pred_act)
             if soul < 33:

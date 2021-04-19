@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras import layers,models, regularizers
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Activation, GlobalAveragePooling2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D, Reshape
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Activation, GlobalAveragePooling2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D, Reshape, Lambda
 from tensorflow.compat.v1.keras.layers import CuDNNLSTM
 import time
 import os
@@ -11,11 +11,11 @@ class BasicBlock(layers.Layer):
         self.filter_num = filter_num
         self.stride = stride
         self.layers = []
-        self.conv1=layers.Conv3D(filter_num,(2,3,3),strides=(1,stride,stride),padding='same', name = name+'_1')
+        self.conv1=layers.Conv2D(filter_num,3,strides=stride,padding='same', name = name+'_1')
         # self.bn1=layers.BatchNormalization()
         self.relu=layers.Activation('relu')
 
-        self.conv2=layers.Conv3D(filter_num,(2,3,3),strides=1,padding='same', name = name+'_2')
+        self.conv2=layers.Conv2D(filter_num,3,strides=1,padding='same', name = name+'_2')
         # self.bn2 = layers.BatchNormalization()
         self.layers.append(self.conv1)
         self.layers.append(self.conv2)
@@ -23,7 +23,7 @@ class BasicBlock(layers.Layer):
         # self.layers.append(self.bn2)
         if stride!=1:
             self.downsample=models.Sequential()
-            self.downsample.add(layers.Conv3D(filter_num,(1,1,1),strides=(1,stride,stride)))
+            self.downsample.add(layers.Conv2D(filter_num,1,strides=stride))
             self.layers.append(self.downsample)
         else:
             self.downsample=lambda x:x
@@ -93,6 +93,7 @@ class Model:
         
 
     def save_mode(self):
+        print("save model")
         self.private_act_model.save("./model/act_part.h5")
         self.private_move_model.save("./model/move_part.h5")
 
@@ -119,7 +120,7 @@ class Model:
 
         # shared part
         # pre-process block
-        # self.shared_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # self.shared_model.add(Conv2D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
         # # self.shared_model.add(BatchNormalization(name='b1'))
         # self.shared_model.add(Activation('relu'))
         # self.shared_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
@@ -130,42 +131,48 @@ class Model:
         # self.shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
 
         # output layer for action model
-        self.private_act_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
-        # self.private_act_model.add(BatchNormalization(name='b1'))
+        self.private_act_model.add(Conv3D(32, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
         self.private_act_model.add(Activation('relu'))
-        self.private_act_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
-        
+        self.private_act_model.add(Conv3D(48, (2,3,3),strides=(1,1,1), input_shape=self.input_shape, name='conv2'))
+        self.private_act_model.add(Activation('relu'))
+        self.private_act_model.add(Conv3D(64, (2,3,3),strides=(1,1,1), input_shape=self.input_shape, name='conv3'))
+        self.private_act_model.add(Activation('relu'))
+        self.private_act_model.add(Lambda(lambda x:tf.reduce_sum(x, 1)))
+        # self.private_act_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
         # resnet blocks
         self.private_act_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        self.private_act_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.private_act_model.add(self.build_resblock(96, 2, name='Resnet_2', stride=2))
         self.private_act_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-
-        self.private_act_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
-        self.private_act_model.add(GlobalAveragePooling3D())
+        self.private_act_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
+        self.private_act_model.add(GlobalAveragePooling2D())
         # self.private_act_model.add(Reshape((1, -1)))
         # self.private_act_model.add(CuDNNLSTM(32))
-        self.private_act_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))        # action model
-        
+        self.private_act_model.add(Dense(self.act_dim, name="d1"))        # action model
+        self.private_act_model.summary()
         self.act_model = models.Sequential()
         # self.act_model.add(self.shared_model)
         self.act_model.add(self.private_act_model)
  
 
         # output layer for move model
-        self.private_move_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
-        # self.private_move_model.add(BatchNormalization(name='b1'))
+        self.private_move_model.add(Conv3D(32, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
         self.private_move_model.add(Activation('relu'))
-        self.private_move_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        self.private_move_model.add(Conv3D(48, (2,3,3),strides=(1,1,1), input_shape=self.input_shape, name='conv2'))
+        self.private_move_model.add(Activation('relu'))
+        self.private_move_model.add(Conv3D(64, (2,3,3),strides=(1,1,1), input_shape=self.input_shape, name='conv3'))
+        self.private_move_model.add(Activation('relu'))
+        self.private_move_model.add(Lambda(lambda x:tf.reduce_sum(x, 1)))
+        # self.private_move_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
         
         # resnet blocks
         self.private_move_model.add(self.build_resblock(64, 2, name='Resnet_1'))
-        self.private_move_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.private_move_model.add(self.build_resblock(96, 2, name='Resnet_2', stride=2))
         self.private_move_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
-        self.private_move_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
-        self.private_move_model.add(GlobalAveragePooling3D())
+        self.private_move_model.add(self.build_resblock(256, 2, name='Resnet_4', stride=2))
+        self.private_move_model.add(GlobalAveragePooling2D())
         # self.private_move_model.add(Reshape((1, -1)))
         # self.private_move_model.add(CuDNNLSTM(32))
-        self.private_move_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+        self.private_move_model.add(Dense(4, name="d1"))
 
         # action model
         self.move_model = models.Sequential()

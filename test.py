@@ -8,6 +8,33 @@ from Tool.WindowsAPI import grab_screen
 from Tool.Actions import take_action, restart, take_direction
 from Tool.Helper import pause_game, direction_reward, distance_reward
 import os
+import Tool.WindowsAPI
+import Tool.SendKey
+
+
+print("WinAPI:")
+start_time = time.time()
+Tool.WindowsAPI.PressKey(0x26)
+print("send key time: ", time.time() - start_time)
+
+start_time = time.time()
+Tool.WindowsAPI.ReleaseKey(0x26)
+print("release key time: ", time.time() - start_time)
+
+
+print("User32:")
+start_time = time.time()
+Tool.SendKey.PressKey(0x26)
+print("send key time: ", time.time() - start_time)
+
+start_time = time.time()
+Tool.SendKey.ReleaseKey(0x26)
+print("release key time: ", time.time() - start_time)
+
+
+
+
+
 
 # from Model import Model
 
@@ -80,16 +107,16 @@ import os
 # check_point = (612, 187)
 # # start_time = time.time()
 
-h = Hp_getter()
-last_hy = 0
-while True:
-    # take_action(6)
-    px, py = h.get_play_location()
-    hx, hy = h.get_hornet_location()
-    if last_hy > 32 and last_hy < 32.5 and hy > 32 and last_hy < 32.5:
-        print("skill")
-    last_hy = hy
-    time.sleep(0.25)
+# h = Hp_getter()
+# last_hy = 0
+# while True:
+#     # take_action(6)
+#     px, py = h.get_play_location()
+#     hx, hy = h.get_hornet_location()
+#     if last_hy > 32 and last_hy < 32.5 and hy > 32 and last_hy < 32.5:
+#         print("skill")
+#     last_hy = hy
+#     time.sleep(0.25)
     # print(direction_reward(0, px, hx), "   ",distance_reward(0, px, hx), " ", px - hx)
     # print(h.get_play_location(), "   ",h.get_hornet_location())
     # hp_station = cv2.cvtColor(cv2.resize(grab_screen(station_size),(WIDTH,HEIGHT)),cv2.COLOR_RGBA2RGB)
