@@ -1,257 +1,227 @@
-# -*- coding: utf-8 -*-
-import numpy as np
-from tensorflow.keras.models import load_model
 import tensorflow as tf
-import os
-import cv2
+from tensorflow.keras.models import load_model
+from tensorflow.keras import layers,models, regularizers
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Activation, GlobalAveragePooling2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D, Reshape
+from tensorflow.compat.v1.keras.layers import CuDNNLSTM
 import time
-import collections
-import matplotlib.pyplot as plt
+import os
+class BasicBlock(layers.Layer):
+    def __init__(self,filter_num,name,stride=1, **kwargs):
+        super(BasicBlock, self).__init__( **kwargs)
+        self.filter_num = filter_num
+        self.stride = stride
+        self.layers = []
+        self.conv1=layers.Conv3D(filter_num,(2,3,3),strides=(1,stride,stride),padding='same', name = name+'_1')
+        # self.bn1=layers.BatchNormalization()
+        self.relu=layers.Activation('relu')
 
-from Model import Model
-from DQN import DQN
-from Agent import Agent
-from ReplayMemory import ReplayMemory
+        self.conv2=layers.Conv3D(filter_num,(2,3,3),strides=1,padding='same', name = name+'_2')
+        # self.bn2 = layers.BatchNormalization()
+        self.layers.append(self.conv1)
+        self.layers.append(self.conv2)
+        # self.layers.append(self.bn1)
+        # self.layers.append(self.bn2)
+        if stride!=1:
+            self.downsample=models.Sequential()
+            self.downsample.add(layers.Conv3D(filter_num,(1,1,1),strides=(1,stride,stride)))
+            self.layers.append(self.downsample)
+        else:
+            self.downsample=lambda x:x
 
+    def get_layer(self, index):
+        return self.layers[index]
 
-import Tool.Helper
-import Tool.Actions
-from Tool.Helper import mean, is_end
-from Tool.Actions import take_action, restart,take_direction, TackAction
-from Tool.WindowsAPI import grab_screen
-from Tool.GetHP import Hp_getter
-from Tool.UserInput import User
-from Tool.FrameBuffer import FrameBuffer
+    def get_layers(self):
+        return self.layers
 
-window_size = (0,0,1920,1017)
-station_size = (230, 230, 1670, 930)
+    def call(self,input,training=None):
+        out=self.conv1(input)
+        # out=self.bn1(out)
+        out=self.relu(out)
 
-HP_WIDTH = 768
-HP_HEIGHT = 407
-WIDTH = 600
-HEIGHT = 300
-ACTION_DIM = 7
-FRAMEBUFFERSIZE = 4
-INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
+        out=self.conv2(out)
+        # out=self.bn2(out)
 
-LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
-MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
-MEMORY_WARMUP_SIZE = 24  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 6  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
-LEARNING_RATE = 0.00001  # 学习率
-GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
+        identity=self.downsample(input)
+        output=layers.add([out,identity])
+        output=tf.nn.relu(output)
+        return output
 
-action_name = ["Attack", "Attack_Up",
-           "Short_Jump", "Mid_Jump", "Skill_Up", 
-           "Skill_Down", "Rush", "Cure"]
+    def get_config(self):
+        config = {
+            'filter_num':
+                self.filter_num,
+            'stride':
+               self.stride
+        }
 
-move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
-
-DELEY_REWARD = 1
-
-
-
-
-def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_correct, move_rmp_wrong,PASS_COUNT,paused):
-    restart()
-    # learn while load game
-    for i in range(8):
-        if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
-            # print("move learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
-
-        if (len(act_rmp_correct) > MEMORY_WARMUP_SIZE):
-            # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
-
-    
-    step = 0
-    done = 0
-    total_reward = 0
-
-    start_time = time.time()
-    # Deley Reward
-    DeleyMoveReward = collections.deque(maxlen=DELEY_REWARD)
-    DeleyActReward = collections.deque(maxlen=DELEY_REWARD)
-    DeleyStation = collections.deque(maxlen=DELEY_REWARD + 1) # 1 more for next_station
-    DeleyActions = collections.deque(maxlen=DELEY_REWARD)
-    DeleyDirection = collections.deque(maxlen=DELEY_REWARD)
-    
-    while True:
-        boss_hp_value = hp.get_boss_hp()
-        self_hp = hp.get_self_hp()
-        if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
-            break
-        
-
-    thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE)
-    thread1.start()
-
-    last_hornet_y = 0
-    while True:
-        step += 1
-        # last_time = time.time()
-        # no more than 10 mins
-        # if time.time() - start_time > 600:
-        #     break
-
-        # in case of do not collect enough frames
-        
-        while(len(thread1.buffer) < FRAMEBUFFERSIZE):
-            time.sleep(0.1)
-        
-        stations = thread1.get_buffer()
-        boss_hp_value = hp.get_boss_hp()
-        self_hp = hp.get_self_hp()
-        player_x, player_y = hp.get_play_location()
-        hornet_x, hornet_y = hp.get_hornet_location()
-        soul = hp.get_souls()
+        base_config = super(BasicBlock, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
 
-        move, action = agent.sample(stations, soul, hornet_x, hornet_y, player_x)
+class Model:
+    def __init__(self, input_shape, act_dim):
+        self.act_dim = act_dim
+        self.input_shape = input_shape
+        self._build_model()
+        self.act_loss = []
+        self.move_loss = []
 
-        
-        # action = 0
-        take_direction(move)
-        take_action(action)
-        
-        # print(time.time() - start_time, " action: ", action_name[action])
-        # start_time = time.time()
-        
-        next_station = thread1.get_buffer()
-        next_boss_hp_value = hp.get_boss_hp()
-        next_self_hp = hp.get_self_hp()
-        next_player_x, next_player_y = hp.get_play_location()
-        next_hornet_x, next_hornet_y = hp.get_hornet_location()
-        hornet_skill1 = False
-        if last_hornet_y > 32 and last_hornet_y < 32.5 and hornet_y > 32 and hornet_y < 32.5:
-            hornet_skill1 = True
-        last_hornet_y = hornet_y
-        # get reward
-        move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1)
+    def load_model(self):
 
-        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x,next_hornet_x, action, hornet_skill1)
-            # print(reward)
-        # print( action_name[action], ", ", move_name[d], ", ", reward)
-        
-        DeleyMoveReward.append(move_reward)
-        DeleyActReward.append(act_reward)
-        DeleyStation.append(stations)
-        DeleyActions.append(action)
-        DeleyDirection.append(move)
-
-        if len(DeleyStation) >= DELEY_REWARD + 1:
-            if DeleyMoveReward[0] != 0:
-                move_rmp_correct.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
-            # if DeleyMoveReward[0] <= 0:
-            #     move_rmp_wrong.append((DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done))
-
-        if len(DeleyStation) >= DELEY_REWARD + 1:
-            if mean(DeleyActReward) != 0:
-                act_rmp_correct.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
-            # if mean(DeleyActReward) <= 0:
-            #     act_rmp_wrong.append((DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done))
-
-        station = next_station
-        self_hp = next_self_hp
-        boss_hp_value = next_boss_hp_value
+        # self.shared_model = load_model("./model/shared_model.h5", custom_objects={'BasicBlock': BasicBlock})
+        if os.path.exists("./model/act_part.h5"):
+            print("load action model")
+            self.act_model = models.Sequential()
+            self.private_act_model = load_model("./model/act_part.h5", custom_objects={'BasicBlock': BasicBlock})
+            # self.act_model.add(self.shared_model)
+            self.act_model.add(self.private_act_model)
             
+        if os.path.exists("./model/move_part.h5"):
+            print("load move model")
+            self.move_model = models.Sequential()
+            self.private_move_model = load_model("./model/move_part.h5", custom_objects={'BasicBlock': BasicBlock})
+            # self.move_model.add(self.shared_model)
+            self.move_model.add(self.private_move_model)
 
-        # if (len(act_rmp) > MEMORY_WARMUP_SIZE and int(step/ACTION_SEQ) % LEARN_FREQ == 0):
-        #     print("action learning")
-        #     batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp.sample(BATCH_SIZE)
-        #     algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
-
-        total_reward += act_reward
-        paused = Tool.Helper.pause_game(paused)
-
-        if done == 1:
-            Tool.Actions.Nothing()
-            break
-        elif done == 2:
-            PASS_COUNT += 1
-            Tool.Actions.Nothing()
-            time.sleep(3)
-            break
+        
+        
         
 
-    thread1.stop()
+        
+        
+        
 
-    for i in range(8):
-        if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
-            # print("move learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
-            algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
-
-        if (len(act_rmp_correct) > MEMORY_WARMUP_SIZE):
-            # print("action learning")
-            batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
-            algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
-    # if (len(move_rmp_wrong) > MEMORY_WARMUP_SIZE):
-    #     # print("move learning")
-    #     batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_wrong.sample(1)
-    #     algorithm.move_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)   
-
-    # if (len(act_rmp_wrong) > MEMORY_WARMUP_SIZE):
-    #     # print("action learning")
-    #     batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_wrong.sample(1)
-    #     algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
-
-    return total_reward, step, PASS_COUNT, self_hp
+    def save_mode(self):
+        self.private_act_model.save("./model/act_part.h5")
+        self.private_move_model.save("./model/move_part.h5")
 
 
-if __name__ == '__main__':
-
-    # In case of out of memory
-    config = tf.compat.v1.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.allow_growth = True      #程序按需申请内存
-    sess = tf.compat.v1.Session(config = config)
-
-    
-    total_remind_hp = 0
-
-    act_rmp_correct = ReplayMemory(MEMORY_SIZE, file_name='./act_memory')         # experience pool
-    act_rmp_wrong = ReplayMemory(MEMORY_SIZE, file_name='./act_memory')         # experience pool
-    move_rmp_correct = ReplayMemory(MEMORY_SIZE,file_name='./move_memory')         # experience pool
-    move_rmp_wrong = ReplayMemory(MEMORY_SIZE,file_name='./move_memory')         # experience pool
-    
-    # new model, if exit save file, load it
-    model = Model(INPUT_SHAPE, ACTION_DIM)  
-
-    # Hp counter
-    hp = Hp_getter()
+    def build_resblock(self,filter_num,blocks,name="Resnet",stride=1):
+        res_blocks= models.Sequential()
+        # may down sample
+        res_blocks.add(BasicBlock(filter_num,name+'_1',stride))
+        # just down sample one time
+        for pre in range(1,blocks):
+            res_blocks.add(BasicBlock(filter_num,name+'_2',stride=1))
+        return res_blocks
 
 
-    model.load_model()
-    algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.1,e_greed_decrement=1e-6)
-    
-    # get user input, no need anymore
-    # user = User()
+    # use two groups of net, one for action, one for move
+    def _build_model(self):
 
-    # paused at the begining
-    paused = True
-    paused = Tool.Helper.pause_game(paused)
+       # ------------------ build evaluate_net ------------------
 
-    max_episode = 30000
-    # 开始训练
-    episode = 0
-    PASS_COUNT = 0                                       # pass count
-    while episode < max_episode:    # 训练max_episode个回合，test部分不计算入episode数量
-        # 训练
-        episode += 1     
-        # if episode % 20 == 1:
-        #     algorithm.replace_target()
+       
+        self.shared_model = models.Sequential()
+        self.private_act_model = models.Sequential()
+        self.private_move_model = models.Sequential()
 
-        total_reward, total_step, PASS_COUNT, remind_hp = run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_correct, move_rmp_wrong, PASS_COUNT, paused)
-        if episode % 10 == 1:
-            model.save_mode()
-        if episode % 5 == 0:
-            move_rmp_correct.save(move_rmp_correct.file_name)
-        if episode % 5 == 0:
-            act_rmp_correct.save(act_rmp_correct.file_name)
-        total_remind_hp += remind_hp
-        print("Episode: ", episode, ", pass_count: " , PASS_COUNT, ", hp:", total_remind_hp / episode)
+        # shared part
+        # pre-process block
+        # self.shared_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # # self.shared_model.add(BatchNormalization(name='b1'))
+        # self.shared_model.add(Activation('relu'))
+        # self.shared_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        
+        # # resnet blocks
+        # self.shared_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        # self.shared_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        # self.shared_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
 
+        # output layer for action model
+        self.private_act_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # self.private_act_model.add(BatchNormalization(name='b1'))
+        self.private_act_model.add(Activation('relu'))
+        self.private_act_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        
+        # resnet blocks
+        self.private_act_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        self.private_act_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.private_act_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+
+        self.private_act_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
+        self.private_act_model.add(GlobalAveragePooling3D())
+        # self.private_act_model.add(Reshape((1, -1)))
+        # self.private_act_model.add(CuDNNLSTM(32))
+        self.private_act_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))        # action model
+        
+        self.act_model = models.Sequential()
+        # self.act_model.add(self.shared_model)
+        self.act_model.add(self.private_act_model)
+ 
+
+        # output layer for move model
+        self.private_move_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+        # self.private_move_model.add(BatchNormalization(name='b1'))
+        self.private_move_model.add(Activation('relu'))
+        self.private_move_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        
+        # resnet blocks
+        self.private_move_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+        self.private_move_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+        self.private_move_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+        self.private_move_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
+        self.private_move_model.add(GlobalAveragePooling3D())
+        # self.private_move_model.add(Reshape((1, -1)))
+        # self.private_move_model.add(CuDNNLSTM(32))
+        self.private_move_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+
+        # action model
+        self.move_model = models.Sequential()
+        # self.move_model.add(self.shared_model)
+        self.move_model.add(self.private_move_model)
+
+
+
+
+    #     # ------------------ build target_model ------------------
+    #    # shared part
+       
+    #     self.shared_target_model = models.Sequential()
+    #     # pre-process block
+    #     self.shared_target_model.add(Conv3D(64, (2,3,3),strides=(1,2,2), input_shape=self.input_shape, name='conv1'))
+    #     self.shared_target_model.add(BatchNormalization(name='b1'))
+    #     self.shared_target_model.add(Activation('relu'))
+    #     self.shared_target_model.add(MaxPooling3D(pool_size=(2,2,2), strides=1, padding="VALID", name='p1'))
+        
+    #     # resnet blocks
+    #     self.shared_target_model.add(self.build_resblock(64, 2, name='Resnet_1'))
+    #     self.shared_target_model.add(self.build_resblock(80, 2, name='Resnet_2', stride=2))
+    #     self.shared_target_model.add(self.build_resblock(128, 2, name='Resnet_3', stride=2))
+
+    #     # output layer for action model
+    #     self.private_act_target_model = models.Sequential()
+    #     self.private_act_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
+    #     self.private_act_target_model.add(GlobalAveragePooling3D())
+    #     # self.private_act_target_model.add(Reshape((1, -1)))
+    #     # self.private_act_target_model.add(CuDNNLSTM(32))
+    #     self.private_act_target_model.add(Dense(self.act_dim, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+
+    #     # action model
+    #     self.act_target_model = models.Sequential()
+    #     self.act_target_model.add(self.shared_target_model)
+    #     self.act_target_model.add(self.private_act_target_model)
+ 
+
+    #     # output layer for move model
+    #     self.private_move_target_model = models.Sequential()
+    #     self.private_move_target_model.add(self.build_resblock(200, 2, name='Resnet_4', stride=2))
+    #     self.private_move_target_model.add(GlobalAveragePooling3D())
+    #     # self.private_move_target_model.add(Reshape((1, -1)))
+    #     # self.private_move_target_model.add(CuDNNLSTM(32))
+    #     self.private_move_target_model.add(Dense(4, name="d1", kernel_regularizer=regularizers.L2(0.001)))
+
+    #     # action model
+    #     self.move_target_model = models.Sequential()
+    #     self.move_target_model.add(self.shared_target_model)
+    #     self.move_target_model.add(self.private_move_target_model)
+
+
+    def predict(self, input):
+        
+        input = tf.expand_dims(input,axis=0)
+        # shard_output = self.shared_model.predict(input)
+        pred_move = self.private_move_model(input)
+        pred_act = self.private_act_model(input)
+        return pred_move, pred_act
