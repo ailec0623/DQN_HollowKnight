@@ -28,8 +28,8 @@ station_size = (230, 230, 1670, 930)
 
 HP_WIDTH = 768
 HP_HEIGHT = 407
-WIDTH = 600
-HEIGHT = 300
+WIDTH = 400
+HEIGHT = 200
 ACTION_DIM = 7
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
@@ -37,7 +37,7 @@ INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
 MEMORY_WARMUP_SIZE = 24  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
-BATCH_SIZE = 6  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
+BATCH_SIZE = 10  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.00001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
@@ -131,7 +131,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         last_hornet_y = hornet_y
         # get reward
         move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1)
-
+        # print(move_reward)
         act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x,next_hornet_x, action, hornet_skill1)
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)

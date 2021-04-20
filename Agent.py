@@ -13,8 +13,8 @@ class Agent:
     def sample(self, station, soul, hornet_x, hornet_y, player_x):
         
         pred_move, pred_act = self.algorithm.model.predict(station)
-        print(pred_move)
-        print(self.e_greed)
+        # print(pred_move)
+        # print(self.e_greed)
         pred_move = pred_move.numpy()
         pred_act = pred_act.numpy()
         sample = np.random.rand()  
