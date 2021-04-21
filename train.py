@@ -109,8 +109,12 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         hornet_x, hornet_y = hp.get_hornet_location()
         soul = hp.get_souls()
 
+        hornet_skill1 = False
+        if last_hornet_y > 32 and last_hornet_y < 32.5 and hornet_y > 32 and hornet_y < 32.5:
+            hornet_skill1 = True
+        last_hornet_y = hornet_y
 
-        move, action = agent.sample(stations, soul, hornet_x, hornet_y, player_x)
+        move, action = agent.sample(stations, soul, hornet_x, hornet_y, player_x, hornet_skill1)
 
         
         # action = 0
@@ -125,10 +129,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         next_self_hp = hp.get_self_hp()
         next_player_x, next_player_y = hp.get_play_location()
         next_hornet_x, next_hornet_y = hp.get_hornet_location()
-        hornet_skill1 = False
-        if last_hornet_y > 32 and last_hornet_y < 32.5 and hornet_y > 32 and hornet_y < 32.5:
-            hornet_skill1 = True
-        last_hornet_y = hornet_y
+
         # get reward
         move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1)
         # print(move_reward)
@@ -226,7 +227,7 @@ if __name__ == '__main__':
 
     model.load_model()
     algorithm = DQN(model, gamma=GAMMA, learnging_rate=LEARNING_RATE)
-    agent = Agent(ACTION_DIM,algorithm,e_greed=0.1,e_greed_decrement=1e-6)
+    agent = Agent(ACTION_DIM,algorithm,e_greed=0.12,e_greed_decrement=1e-6)
     
     # get user input, no need anymore
     # user = User()
