@@ -34,12 +34,11 @@ ACTION_DIM = 7
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
-LEARN_FREQ = 30  # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
 MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
 MEMORY_WARMUP_SIZE = 24  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
 BATCH_SIZE = 10  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.00001  # 学习率
-GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
+
 
 action_name = ["Attack", "Attack_Up",
            "Short_Jump", "Mid_Jump", "Skill_Up", 
@@ -214,9 +213,7 @@ if __name__ == '__main__':
     total_remind_hp = 0
 
     act_rmp_correct = ReplayMemory(MEMORY_SIZE, file_name='./act_memory')         # experience pool
-    act_rmp_wrong = ReplayMemory(MEMORY_SIZE, file_name='./act_memory')         # experience pool
     move_rmp_correct = ReplayMemory(MEMORY_SIZE,file_name='./move_memory')         # experience pool
-    move_rmp_wrong = ReplayMemory(MEMORY_SIZE,file_name='./move_memory')         # experience pool
     
     # new model, if exit save file, load it
     model = Model(INPUT_SHAPE, ACTION_DIM)  
