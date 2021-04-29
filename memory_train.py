@@ -28,8 +28,8 @@ station_size = (230, 230, 1670, 930)
 
 HP_WIDTH = 768
 HP_HEIGHT = 407
-WIDTH = 600
-HEIGHT = 300
+WIDTH = 400
+HEIGHT = 200
 ACTION_DIM = 7
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     for x in os.listdir(act_rmp_correct.file_name):
         file_name = act_rmp_correct.file_name + "/" + x
         act_rmp_correct.load(file_name)
-        for i in range(2):
+        for i in range(10):
             if (len(act_rmp_correct) > MEMORY_WARMUP_SIZE):
                 # print("action learning")
                 batch_station,batch_actions,batch_reward,batch_next_station,batch_done = act_rmp_correct.sample(BATCH_SIZE)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     for x in os.listdir(move_rmp_correct.file_name):
         file_name = move_rmp_correct.file_name + "/" + x
         move_rmp_correct.load(file_name)
-        for i in range(2):
+        for i in range(10):
             if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
                 # print("action learning")
                 batch_station,batch_actions,batch_reward,batch_next_station,batch_done = move_rmp_correct.sample(BATCH_SIZE)
