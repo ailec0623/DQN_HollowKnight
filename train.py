@@ -38,7 +38,7 @@ MEMORY_SIZE = 200  # replay memory的大小，越大越占用内存
 MEMORY_WARMUP_SIZE = 24  # replay_memory 里需要预存一些经验数据，再从里面sample一个batch的经验让agent去learn
 BATCH_SIZE = 10  # 每次给agent learn的数据数量，从replay memory随机里sample一批数据出来
 LEARNING_RATE = 0.00001  # 学习率
-
+GAMMA = 0
 
 action_name = ["Attack", "Attack_Up",
            "Short_Jump", "Mid_Jump", "Skill_Up", 
