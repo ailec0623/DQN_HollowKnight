@@ -40,7 +40,7 @@
 
 ## Changes
 
-- Add deley reward of an action
+- Add delay reward of an action
 
 - Make the mdoel output an action sequence
 
