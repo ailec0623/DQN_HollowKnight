@@ -47,7 +47,7 @@ action_name = ["Attack", "Attack_Up",
 
 move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
-DELEY_REWARD = 1
+DELAY_REWARD = 1
 
 
 if __name__ == '__main__':

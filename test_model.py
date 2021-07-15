@@ -47,7 +47,7 @@ action_name = ["Attack", "Attack_Down", "Attack_Up",
 
 move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
 
-DELEY_REWARD = 1
+DELAY_REWARD = 1
 
 
 
@@ -80,12 +80,12 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
     total_reward = 0
 
     start_time = time.time()
-    # Deley Reward
-    DeleyMoveReward = collections.deque(maxlen=DELEY_REWARD)
-    DeleyActReward = collections.deque(maxlen=DELEY_REWARD)
-    DeleyStation = collections.deque(maxlen=DELEY_REWARD + 1) # 1 more for next_station
-    DeleyActions = collections.deque(maxlen=DELEY_REWARD)
-    DeleyDirection = collections.deque(maxlen=DELEY_REWARD)
+    # Delay Reward
+    DelayMoveReward = collections.deque(maxlen=DELAY_REWARD)
+    DelayActReward = collections.deque(maxlen=DELAY_REWARD)
+    DelayStation = collections.deque(maxlen=DELAY_REWARD + 1) # 1 more for next_station
+    DelayActions = collections.deque(maxlen=DELAY_REWARD)
+    DelayDirection = collections.deque(maxlen=DELAY_REWARD)
     
     while True:
         boss_hp_value = hp.get_boss_hp()
@@ -138,23 +138,23 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
         
-        DeleyMoveReward.append(move_reward)
-        DeleyActReward.append(act_reward)
-        DeleyStation.append(stations)
-        DeleyActions.append(action)
-        DeleyDirection.append(move)
+        DelayMoveReward.append(move_reward)
+        DelayActReward.append(act_reward)
+        DelayStation.append(stations)
+        DelayActions.append(action)
+        DelayDirection.append(move)
 
-        if len(DeleyStation) >= DELEY_REWARD + 1:
-            if DeleyMoveReward[0] > 0:
-                move_rmp_correct.append(DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done)
-            if DeleyMoveReward[0] < 0:
-                move_rmp_wrong.append(DeleyStation[0],DeleyDirection[0],DeleyMoveReward[0],DeleyStation[1],done)
+        if len(DelayStation) >= DELAY_REWARD + 1:
+            if DelayMoveReward[0] > 0:
+                move_rmp_correct.append(DelayStation[0],DelayDirection[0],DelayMoveReward[0],DelayStation[1],done)
+            if DelayMoveReward[0] < 0:
+                move_rmp_wrong.append(DelayStation[0],DelayDirection[0],DelayMoveReward[0],DelayStation[1],done)
 
-        if len(DeleyStation) >= DELEY_REWARD + 1:
-            if mean(DeleyActReward) > 0:
-                act_rmp_correct.append(DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done)
-            if mean(DeleyActReward) < 0:
-                act_rmp_wrong.append(DeleyStation[0],DeleyActions[0],mean(DeleyActReward),DeleyStation[1],done)
+        if len(DelayStation) >= DELAY_REWARD + 1:
+            if mean(DelayActReward) > 0:
+                act_rmp_correct.append(DelayStation[0],DelayActions[0],mean(DelayActReward),DelayStation[1],done)
+            if mean(DelayActReward) < 0:
+                act_rmp_wrong.append(DelayStation[0],DelayActions[0],mean(DelayActReward),DelayStation[1],done)
 
         station = next_station
         self_hp = next_self_hp
